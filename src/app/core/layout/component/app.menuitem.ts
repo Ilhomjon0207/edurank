@@ -2,7 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RippleModule } from 'primeng/ripple';
-import { LayoutService } from '@/app/layout/service/layout.service';
+import { LayoutService } from '@/app/core/service/layout.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -47,11 +47,11 @@ import { filter } from 'rxjs/operators';
             </a>
         }
         @if (hasChildren() && isVisible() && (root() || isActive())) {
-            <ul [animate.enter]="initialized() ? 'p-submenu-enter' : null" [animate.leave]="'p-submenu-leave'" [class.layout-root-submenulist]="root()">
-                @for (child of item().items; track child?.label) {
-                    <li app-menuitem [item]="child" [parentPath]="fullPath()" [root]="false" [class]="child['badgeClass']"></li>
-                }
-            </ul>
+<!--            <ul [animate?.enter]="initialized() ? 'p-submenu-enter' : null" [animate.leave]="'p-submenu-leave'" [class.layout-root-submenulist]="root()">-->
+<!--                @for (child of item().items; track child?.label) {-->
+<!--                    <li app-menuitem [item]="child" [parentPath]="fullPath()" [root]="false" [class]="child['badgeClass']"></li>-->
+<!--                }-->
+<!--            </ul>-->
         }
     `,
     host: {
