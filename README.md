@@ -1,59 +1,173 @@
-# Sakai19
+EduRank
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.
+Information System for Analyzing and Ranking Students’ Academic Performance
 
-## Development server
+General Information
 
-To start a local development server, run:
+Project type: Diploma (Graduation) Project
+Project title: EduRank
+Field: Information Technologies / Software Engineering
 
-```bash
+EduRank is a web-based information system developed as a diploma project. The system is intended for automated analysis and ranking of students’ academic performance in higher education institutions.
+
+Relevance of the Project
+
+Modern higher education institutions require objective and transparent mechanisms for evaluating students’ academic performance. Traditional assessment methods often do not provide a comprehensive view of a student’s competencies, which complicates the selection of qualified graduates by employers.
+
+The development of an automated student ranking system helps improve transparency, reduce subjectivity, and strengthen the connection between education and the labor market.
+
+Goal of the Project
+
+The goal of this diploma project is to design and implement an information system for analyzing and ranking students based on academic indicators.
+
+Objectives of the Project
+
+Analyze existing student assessment systems
+
+Study approaches to academic performance evaluation
+
+Design system architecture and structure
+
+Develop a web-based frontend application
+
+Implement role-based access control
+
+Provide tools for generating student rankings
+
+Ensure system scalability and usability
+
+Object and Subject of Research
+
+Object of research:
+The process of evaluating students’ academic performance in higher education institutions.
+
+Subject of research:
+Methods and software tools for automated analysis and ranking of students’ academic data.
+
+System Architecture
+
+The system is based on a Client–Server architecture.
+
+Frontend:
+
+Angular framework
+
+Feature-based and layered architecture
+
+Lazy loading of functional modules
+
+Backend:
+
+REST API (planned / implemented separately)
+
+Data exchange using JSON format
+
+Functional Capabilities
+Authentication and Authorization
+
+User authentication system
+
+Role-based access control (administrator, employer, student)
+
+Student Module
+
+Viewing student lists
+
+Viewing detailed student profiles
+
+Filtering and searching by academic criteria
+
+Rating Module
+
+Automatic calculation of student rankings
+
+Display of rating tables
+
+Employer Module
+
+Access to top-ranked students
+
+Candidate selection based on requirements
+
+Administration Module
+
+Management of evaluation criteria
+
+Configuration of ranking parameters
+
+Technologies Used
+
+Frontend:
+
+Angular
+
+TypeScript
+
+HTML5
+
+SCSS
+
+Angular Router
+
+Development Tools:
+
+Node.js
+
+npm
+
+Git
+
+Visual Studio Code
+
+Project Structure (Frontend)
+src/
+├── app/
+│   ├── core/
+│   ├── shared/
+│   ├── features/
+│   ├── app.component.*
+│   └── app.routes.ts
+├── assets/
+├── environments/
+└── main.ts
+
+Installation and Running
+
+Clone the repository:
+
+git clone https://github.com/your-username/edurank.git
+
+
+Install dependencies:
+
+npm install
+
+
+Run the project:
+
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Code scaffolding
+Open in browser:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+http://localhost:4200
 
-```bash
-ng generate component component-name
-```
+Practical Significance
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The developed system can be used by higher education institutions for academic performance analysis and by employers for selecting highly qualified graduates. The project can be extended and integrated with university information systems.
 
-```bash
-ng generate --help
-```
+Project Status
 
-## Building
+Architecture designed
 
-To build the project run:
+Frontend structure implemented
 
-```bash
-ng build
-```
+Routing with lazy loading configured
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Core functionality under development
 
-## Running unit tests
+Author
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Ilhomjon
+Diploma Project
+Faculty of Information Technologies
