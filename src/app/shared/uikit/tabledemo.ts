@@ -16,8 +16,8 @@ import { RippleModule } from 'primeng/ripple';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { TagModule } from 'primeng/tag';
-import { Customer, CustomerService, Representative } from '@/app/pages/service/customer.service';
-import { Product, ProductService } from '@/app/pages/service/product.service';
+import { Customer, CustomerService, Representative } from '@/app/core/service/customer.service';
+import { Product, ProductService } from '@/app/core/service/product.service';
 import {ObjectUtils} from "primeng/utils";
 
 interface expandedRows {
