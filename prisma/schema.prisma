@@ -14,37 +14,122 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  password  String
-  role      Role      @default(STUDENT)
-  tasks     Task[]
-  rankings  Ranking[]
-  logs      Log[]
-  createdAt DateTime  @default(now())
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(STUDENT)
+
+  profile Profile?
+  skills  UserSkill[]
+
+  tasks        Task[]
+  rankings     Ranking[]
+  logs         Log[]
+  applications Application[]
+
+  createdAt   DateTime   @default(now())
+  criterionId Int?
+  criterion   Criterion? @relation(fields: [criterionId], references: [id], name: "UserCriterion")
+}
+
+model Profile {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  gpa        Float?
+  experience Int? // годы опыта
+  bio        String?
+
+  createdAt DateTime @default(now())
+}
+
+model Skill {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  users     UserSkill[]
+  jobSkills JobSkill[]
+}
+
+model UserSkill {
+  id      Int @id @default(autoincrement())
+  userId  Int
+  skillId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId])
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   title       String
   description String?
-  student     User?     @relation(fields: [studentId], references: [id])
-  studentId   Int?
-  dueDate     DateTime?
-  createdAt   DateTime  @default(now())
+
+  student   User? @relation(fields: [studentId], references: [id])
+  studentId Int?
+
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Ranking {
-  id        Int      @id @default(autoincrement())
-  student   User     @relation(fields: [studentId], references: [id])
+  id        Int  @id @default(autoincrement())
+  student   User @relation(fields: [studentId], references: [id])
   studentId Int
+
   score     Float
   createdAt DateTime @default(now())
 }
 
+model Job {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+
+  minGpa        Float?
+  minExperience Int?
+
+  createdAt DateTime @default(now())
+
+  skills       JobSkill[]
+  applications Application[]
+}
+
+model JobSkill {
+  id      Int @id @default(autoincrement())
+  jobId   Int
+  skillId Int
+
+  job   Job   @relation(fields: [jobId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([jobId, skillId])
+}
+
+model Application {
+  id     Int @id @default(autoincrement())
+  userId Int
+  jobId  Int
+
+  status ApplicationStatus @default(PENDING)
+
+  user User @relation(fields: [userId], references: [id])
+  job  Job  @relation(fields: [jobId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, jobId])
+}
+
 model Log {
-  id        Int      @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
+  userId Int
+  action String
+
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }
@@ -53,4 +138,18 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Criterion {
+  id        Int      @id @default(autoincrement())
+  name      String
+  weight    Float    @default(1)
+  createdAt DateTime @default(now())
+  students  User[]   @relation("UserCriterion")
 }
