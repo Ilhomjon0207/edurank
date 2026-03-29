@@ -1,7 +1,8 @@
 import prisma from "../../../../prisma/client";
 
-export async function POST(req: Request) {
-  const { jobId } = await req.json();
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const jobId = Number(searchParams.get("jobId"));
 
   const job = await prisma.job.findUnique({
     where: { id: jobId },

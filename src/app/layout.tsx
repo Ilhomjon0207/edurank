@@ -1,7 +1,12 @@
+
 import type { Metadata } from "next";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "antd/dist/reset.css";
+
+import Provider from "./Provider";
+import { ConfigProvider } from "antd";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,7 +29,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+
+      <body>
+        <ConfigProvider warning={{ strict: false }}>
+
+          <Provider>
+            {children}
+          </Provider>
+        </ConfigProvider>
+      </body>
     </html>
   );
 }
