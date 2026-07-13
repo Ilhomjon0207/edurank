@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  password    String
+  role        Role          @default(STUDENT)
+  createdAt   DateTime      @default(now())
+  criterionId Int?
+  Application Application[]
+  Log         Log[]
+  Profile     Profile?
+  Ranking     Ranking[]
+  Task        Task[]
+  Criterion   Criterion?    @relation(fields: [criterionId], references: [id])
+  UserSkill   UserSkill[]
+}
+
+model Application {
+  id        Int               @id @default(autoincrement())
+  userId    Int
+  jobId     Int
+  status    ApplicationStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  Job       Job               @relation(fields: [jobId], references: [id])
+  User      User              @relation(fields: [userId], references: [id])
+
+  @@unique([userId, jobId])
+}
+
+model Criterion {
+  id        Int      @id @default(autoincrement())
+  name      String
+  weight    Float    @default(1)
+  createdAt DateTime @default(now())
+  User      User[]
+}
+
+model Job {
+  id            Int           @id @default(autoincrement())
+  title         String
+  description   String?
+  minGpa        Float?
+  minExperience Int?
+  createdAt     DateTime      @default(now())
+  Application   Application[]
+  JobSkill      JobSkill[]
+}
+
+model JobSkill {
+  id      Int   @id @default(autoincrement())
+  jobId   Int
+  skillId Int
+  Job     Job   @relation(fields: [jobId], references: [id])
+  Skill   Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([jobId, skillId])
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  action    String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  gpa        Float?
+  experience Int?
+  bio        String?
+  createdAt  DateTime @default(now())
+  User       User     @relation(fields: [userId], references: [id])
+}
+
+model Ranking {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  score     Float
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [studentId], references: [id])
+}
+
+model Skill {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  JobSkill  JobSkill[]
+  UserSkill UserSkill[]
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  studentId   Int?
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  User        User?     @relation(fields: [studentId], references: [id])
+}
+
+model UserSkill {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  skillId Int
+  Skill   Skill @relation(fields: [skillId], references: [id])
+  User    User  @relation(fields: [userId], references: [id])
+
+  @@unique([userId, skillId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
