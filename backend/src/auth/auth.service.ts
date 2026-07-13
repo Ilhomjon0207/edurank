@@ -58,7 +58,13 @@ export class AuthService {
             role: user.role,
         };
         return {
-            access_token:this.jwtService.sign(payload),
+            access_token:this.jwtService.sign(payload,{
+                expiresIn: '15m'
+            }),
+            refresh_token:this.jwtService.sign(payload,{
+                expiresIn: '7d',
+                secret:process.env.JWT_SECRET
+            }),
             user:safeUser,
         }
     }

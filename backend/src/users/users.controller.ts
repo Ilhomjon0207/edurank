@@ -1,14 +1,15 @@
 import {Controller, Get, Req, UseGuards} from '@nestjs/common';
-import {JwtGuard} from "../auth/guards/jwt.guard";
+import {JwtAuthGuard} from "../auth/guards/jwt.guard";
 import { UsersService } from './users.service';
+import  {CurrentUser} from "../common/decorators/current-user.decorator"
 @Controller('users')
 export class UsersController {
 
     constructor(private usersService: UsersService) {}
 
-    @UseGuards(JwtGuard)
+    @UseGuards(JwtAuthGuard)
     @Get('me')
-    getMe(@Req() req: any) {
-        return this.usersService.findById(req.user.id);
+    getMe(@CurrentUser() user) {
+        return user;
     }
 }
