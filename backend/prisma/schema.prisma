@@ -13,13 +13,11 @@ model User {
   password    String
   role        Role          @default(STUDENT)
   createdAt   DateTime      @default(now())
-  criterionId Int?
   Application Application[]
   Log         Log[]
   Profile     Profile?
   Ranking     Ranking[]
   Task        Task[]
-  Criterion   Criterion?    @relation(fields: [criterionId], references: [id])
   UserSkill   UserSkill[]
 }
 
@@ -28,19 +26,22 @@ model Application {
   userId    Int
   jobId     Int
   status    ApplicationStatus @default(PENDING)
-  createdAt DateTime          @default(now())
+  appliedAt DateTime          @default(now())
   Job       Job               @relation(fields: [jobId], references: [id])
   User      User              @relation(fields: [userId], references: [id])
 
   @@unique([userId, jobId])
+  @@index([jobId])
+  @@index([userId])
 }
 
 model Criterion {
-  id        Int      @id @default(autoincrement())
-  name      String
-  weight    Float    @default(1)
-  createdAt DateTime @default(now())
-  User      User[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  weight      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Job {
@@ -48,18 +49,21 @@ model Job {
   title         String
   description   String?
   minGpa        Float?
+  deadline      DateTime?
   minExperience Int?
   createdAt     DateTime      @default(now())
   Application   Application[]
   JobSkill      JobSkill[]
+  updatedAt     DateTime      @updatedAt
 }
 
 model JobSkill {
-  id      Int   @id @default(autoincrement())
-  jobId   Int
-  skillId Int
-  Job     Job   @relation(fields: [jobId], references: [id])
-  Skill   Skill @relation(fields: [skillId], references: [id])
+  id            Int   @id @default(autoincrement())
+  jobId         Int
+  skillId       Int
+  requiredLevel Int
+  Job           Job   @relation(fields: [jobId], references: [id])
+  Skill         Skill @relation(fields: [skillId], references: [id])
 
   @@unique([jobId, skillId])
 }
@@ -73,28 +77,32 @@ model Log {
 }
 
 model Profile {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @unique
-  gpa        Float?
-  experience Int?
-  bio        String?
-  createdAt  DateTime @default(now())
-  User       User     @relation(fields: [userId], references: [id])
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique
+  gpa              Float?
+  experienceMonths Int?
+  bio              String?
+  createdAt        DateTime @default(now())
+  User             User     @relation(fields: [userId], references: [id])
 }
 
 model Ranking {
-  id        Int      @id @default(autoincrement())
-  studentId Int
-  score     Float
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [studentId], references: [id])
+  id           Int      @id @default(autoincrement())
+  studentId    Int
+  score        Float
+  rank         Int?
+  calculatedAt DateTime @default(now())
+  User         User     @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
 }
 
 model Skill {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique
-  JobSkill  JobSkill[]
-  UserSkill UserSkill[]
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  JobSkill    JobSkill[]
+  UserSkill   UserSkill[]
 }
 
 model Task {
@@ -102,6 +110,7 @@ model Task {
   title       String
   description String?
   studentId   Int?
+  score       Float?
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   User        User?     @relation(fields: [studentId], references: [id])
@@ -111,10 +120,13 @@ model UserSkill {
   id      Int   @id @default(autoincrement())
   userId  Int
   skillId Int
-  Skill   Skill @relation(fields: [skillId], references: [id])
+  level   Int
   User    User  @relation(fields: [userId], references: [id])
+  Skill   Skill @relation(fields: [skillId], references: [id])
 
   @@unique([userId, skillId])
+  @@index([userId])
+  @@index([skillId])
 }
 
 enum ApplicationStatus {
