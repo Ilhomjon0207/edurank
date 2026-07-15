@@ -1,11 +1,11 @@
-import {Controller, Get, Req, UseGuards} from '@nestjs/common';
+import {Controller, Get, UseGuards} from '@nestjs/common';
 import {JwtAuthGuard} from "../auth/guards/jwt.guard";
-import { UsersService } from './users.service';
-import  {CurrentUser} from "../common/decorators/current-user.decorator"
+import {CurrentUser} from "../common/decorators";
+
 @Controller('users')
 export class UsersController {
 
-    constructor(private usersService: UsersService) {}
+    constructor() {}
 
     @UseGuards(JwtAuthGuard)
     @Get('me')
