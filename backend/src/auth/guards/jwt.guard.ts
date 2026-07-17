@@ -12,6 +12,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     override canActivate(context: ExecutionContext) {
+
+        console.log('JWT GUARD START');
+
         const isPublic = this.reflector.getAllAndOverride<boolean>(
             IS_PUBLIC_KEY,
             [
@@ -21,9 +24,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         );
 
         if (isPublic) {
+            console.log('PUBLIC ROUTE');
             return true;
         }
 
-        return super.canActivate(context);
+        const result = super.canActivate(context);
+
+        console.log('JWT RESULT:', result);
+
+        return result;
     }
 }

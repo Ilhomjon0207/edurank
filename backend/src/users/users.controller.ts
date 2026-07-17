@@ -1,7 +1,9 @@
 import {Controller, Get, UseGuards} from '@nestjs/common';
 import {JwtAuthGuard} from "../auth/guards/jwt.guard";
 import {CurrentUser} from "../common/decorators";
+import {ApiBearerAuth} from "@nestjs/swagger";
 
+@ApiBearerAuth('JWT')
 @Controller('users')
 export class UsersController {
 

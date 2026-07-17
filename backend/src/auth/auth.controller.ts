@@ -4,7 +4,8 @@ import {RegisterDto} from "./dto/register.dto";
 import {LoginDto} from "./dto/login.dto";
 import {JwtAuthGuard} from "./guards/jwt.guard";
 import {Public} from "../common/decorators/public.decorator";
-
+import {ApiBearerAuth} from "@nestjs/swagger";
+@ApiBearerAuth('JWT')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
