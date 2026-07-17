@@ -1,14 +1,21 @@
-import {IsNotEmpty, IsString, MaxLength} from "class-validator";
+import {IsOptional, IsString} from "class-validator";
+import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 
 export class CreateSkillDto {
 
-    @IsNotEmpty()
+    @ApiProperty({
+        example: 'NestJS',
+        description: 'Skill name',
+    })
     @IsString()
-    @MaxLength(100)
     name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    description: string;
 
+    @ApiPropertyOptional({
+        example: 'Node.js backend framework',
+        description: 'Skill description',
+    })
+    @IsOptional()
+    @IsString()
+    description?: string;
 }

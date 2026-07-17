@@ -1,19 +1,20 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards} from '@nestjs/common';
 import {SkillService} from "./skill.service";
-import {Roles} from "../common/decorators/roles.decorator";
-import {Role} from "../common/enums";
 import {CreateSkillDto} from "./dto/create-skill.dto";
-import {UpdateSkillDto} from "./dto/update-skill.dto";
 import {Public} from "../common/decorators/public.decorator";
 import {ApiBearerAuth} from "@nestjs/swagger";
-@ApiBearerAuth('JWT')
+import {JwtAuthGuard} from "../auth/guards/jwt.guard";
+import {CurrentUser} from "../common/decorators";
+import {AddUserSkillDto} from "./dto/add-user-skill.dto";
+import {UpdateUserSkillDto} from "./dto/update-user-skill.dto";
+
 @Controller('skills')
 export class SkillController {
 
     constructor(private readonly skillService: SkillService){}
 
-    @Get()
     @Public()
+    @Get()
     findAll(){
         return this.skillService.findAll();
     }
@@ -22,23 +23,56 @@ export class SkillController {
     findOne(@Param('id') id:string){
         return this.skillService.findOne(+id);
     }
-
+    @ApiBearerAuth("JWT")
+    @UseGuards(JwtAuthGuard)
     @Post()
-    create(@Body() createSkillDto: CreateSkillDto){
-        return this.skillService.create(createSkillDto);
+    create(@Body() dto: CreateSkillDto){
+        return this.skillService.create(dto);
     }
 
-    @Patch(':id')
-    @Roles(Role.ADMIN)
-    update(@Param('id') id:string, @Body() updateSkillDto: UpdateSkillDto){
-        return this.skillService.update(+id,updateSkillDto)
+    @ApiBearerAuth('JWT')
+    @UseGuards(JwtAuthGuard)
+    @Patch('me/:skillId')
+    update(
+        @CurrentUser() user,
+        @Param('skillId', ParseIntPipe) skillId: number,
+        @Body() dto: UpdateUserSkillDto,
+    ) {
+        return this.skillService.update(
+            user.id,
+            skillId,
+            dto.level,
+        );
     }
 
+    @ApiBearerAuth('JWT')
+    @UseGuards(JwtAuthGuard)
+    @Delete('me/:skillId')
+    remove(
+        @CurrentUser() user,
+        @Param('skillId', ParseIntPipe) skillId: number,
+    ) {
+        return this.skillService.removeUserSkill(
+            user.id,
+            skillId,
+        );
+    }
 
-    @Delete(':id')
-    @Roles(Role.ADMIN)
-    remove(@Param('id',ParseIntPipe) id:number){
-        return this.skillService.remove(id);
+    @ApiBearerAuth("JWT")
+    @UseGuards(JwtAuthGuard)
+    @Post('me')
+    addUserSkills(@CurrentUser() user,@Body() dto: AddUserSkillDto){
+        return this.skillService.addUserSkill(user.id, dto);
+
+    }
+
+    @Get('me')
+    @ApiBearerAuth('JWT')
+    @UseGuards(JwtAuthGuard)
+    getMySkills(
+        @CurrentUser() user,
+    ) {
+        return this.skillService.getUserSkills(user.id);
     }
 
 }
