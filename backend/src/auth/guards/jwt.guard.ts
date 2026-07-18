@@ -1,7 +1,7 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
+import {ExecutionContext, Injectable} from '@nestjs/common';
+import {Reflector} from '@nestjs/core';
+import {AuthGuard} from '@nestjs/passport';
+import {IS_PUBLIC_KEY} from '../../common/decorators/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -13,8 +13,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     override canActivate(context: ExecutionContext) {
 
-        console.log('JWT GUARD START');
-
         const isPublic = this.reflector.getAllAndOverride<boolean>(
             IS_PUBLIC_KEY,
             [
@@ -24,14 +22,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         );
 
         if (isPublic) {
-            console.log('PUBLIC ROUTE');
             return true;
         }
 
-        const result = super.canActivate(context);
-
-        console.log('JWT RESULT:', result);
-
-        return result;
+        return super.canActivate(context);
     }
 }

@@ -10,6 +10,7 @@ import {JwtAuthGuard} from "./auth/guards/jwt.guard";
 import {RolesGuard} from "./auth/guards/roles.guard";
 import { SkillModule } from './skill/skill.module';
 import { ProfileModule } from './profile/profile.module';
+import { JobModule } from './job/job.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProfileModule } from './profile/profile.module';
     UsersModule,
     SkillModule,
     ProfileModule,
+    JobModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
