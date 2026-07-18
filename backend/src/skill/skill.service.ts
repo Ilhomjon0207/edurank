@@ -16,7 +16,11 @@ export class SkillService {
     }
 
     findAll() {
-        return this.prisma.skill.findMany();
+        return this.prisma.skill.findMany({
+            orderBy: {
+                name: 'asc'
+            }
+        });
     }
 
     findOne(id: number) {
@@ -29,26 +33,26 @@ export class SkillService {
 
     async update(
         userId: number,
-        skillId:number,
-        level:number,
+        skillId: number,
+        level: number,
     ) {
 
-        const skill=await this.prisma.userSkill.findUnique({
+        const skill = await this.prisma.userSkill.findUnique({
             where: {
-                userId_skillId:{
+                userId_skillId: {
                     userId,
                     skillId
                 }
             }
         })
 
-        if(!skill){
+        if (!skill) {
             throw new NotFoundException('No skill with this id')
         }
 
         return this.prisma.userSkill.update({
             where: {
-                userId_skillId:{
+                userId_skillId: {
                     userId,
                     skillId
                 }
@@ -59,10 +63,23 @@ export class SkillService {
         });
     }
 
-   async removeUserSkill(userId: number,skillId:number) {
+    async removeUserSkill(userId: number, skillId: number) {
+        const userSkill = await this.prisma.userSkill.findUnique({
+            where: {
+                userId_skillId: {
+                    userId,
+                    skillId
+                }
+            }
+        })
+
+        if (!userSkill) {
+            throw new NotFoundException('No skill with this id')
+        }
+
         return this.prisma.userSkill.delete({
             where: {
-                userId_skillId:{
+                userId_skillId: {
                     userId,
                     skillId
                 }
@@ -74,11 +91,19 @@ export class SkillService {
         userId: number,
         dto: AddUserSkillDto,
     ) {
-        const exists=await this.prisma.userSkill.findUnique({
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        })
+        if (!user) {
+            throw new NotFoundException('User not exists');
+        }
+        const exists = await this.prisma.userSkill.findUnique({
             where: {
                 userId_skillId: {
                     userId: userId,
-                    skillId:dto.skillId
+                    skillId: dto.skillId
                 }
             }
         })
@@ -87,6 +112,16 @@ export class SkillService {
             throw new ConflictException('Skill already exists');
         }
 
+
+        const skill= await  this.prisma.skill.findUnique({
+            where: {
+                id:dto.skillId
+            }
+        })
+
+        if (!skill) {
+            throw new NotFoundException('Skill not exist');
+        }
         return this.prisma.userSkill.create({
             data: {
                 userId,
