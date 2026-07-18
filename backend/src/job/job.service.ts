@@ -2,6 +2,7 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {CreateJobDto} from './dto/create-job.dto';
 import {UpdateJobDto} from './dto/update-job.dto';
 import {PrismaService} from "../prisma/prisma.service";
+import {CreateJobSkillDTO} from "./dto/create-job-skill.dto";
 
 @Injectable()
 export class JobService {
@@ -77,7 +78,7 @@ export class JobService {
 
     async update(id: number, dto: UpdateJobDto) {
         const job = await this.prisma.job.findUnique({
-            where: { id },
+            where: {id},
         });
 
         if (!job) {
@@ -86,7 +87,7 @@ export class JobService {
 
         return this.prisma.$transaction(async (tx) => {
             await tx.job.update({
-                where: { id },
+                where: {id},
                 data: {
                     title: dto.title,
                     description: dto.description,
@@ -113,7 +114,7 @@ export class JobService {
             }
 
             return tx.job.findUnique({
-                where: { id },
+                where: {id},
                 include: {
                     JobSkill: {
                         include: {
@@ -133,5 +134,52 @@ export class JobService {
                 id
             }
         });
+    }
+
+    async addJobSkill(jobId: number, dto: CreateJobSkillDTO) {
+
+        const job = await this.prisma.job.findUnique({
+            where: {
+                id: jobId
+            }
+        })
+
+        if (!job) {
+            throw new NotFoundException('Job not found');
+        }
+
+        const skill = await this.prisma.skill.findUnique({
+            where: {
+                id: dto.skillId,
+            }
+        })
+
+        if (!skill) {
+            throw new NotFoundException('Skill not found');
+        }
+
+        const exists = await this.prisma.jobSkill.findUnique({
+            where: {
+                jobId_skillId: {
+                    jobId: jobId,
+                    skillId: dto.skillId,
+                }
+            }
+        })
+
+        if (exists) {
+            throw new NotFoundException('Skill already added');
+        }
+
+        return this.prisma.jobSkill.create({
+            data: {
+                jobId: jobId,
+                skillId: dto.skillId,
+                requiredLevel: dto.requiredLevel,
+            },
+            include: {
+                Skill: true,
+            }
+        })
     }
 }
