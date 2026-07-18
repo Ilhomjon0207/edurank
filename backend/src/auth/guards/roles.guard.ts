@@ -20,11 +20,6 @@ export class RolesGuard implements CanActivate {
 
     canActivate(context: ExecutionContext){
 
-        console.log('HANDLER:', context.getHandler().name);
-        console.log(
-            'CLASS:',
-            context.getClass().name
-        );
 
         const roles = this.reflector.getAllAndOverride<Role[]>(
             ROLES_KEY,
@@ -35,8 +30,6 @@ export class RolesGuard implements CanActivate {
         );
 
 
-        console.log('REQUIRED ROLES:', roles);
-
 
         if (!roles) {
             return true;
@@ -44,10 +37,6 @@ export class RolesGuard implements CanActivate {
 
 
         const request = context.switchToHttp().getRequest();
-
-        console.log('HANDLER:', context.getHandler().name);
-        console.log('ROLES:', roles);
-        console.log('USER:', request.user);
 
 
         const user = request.user;

@@ -8,9 +8,10 @@ import {UsersModule} from './users/users.module';
 import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./auth/guards/jwt.guard";
 import {RolesGuard} from "./auth/guards/roles.guard";
-import { SkillModule } from './skill/skill.module';
-import { ProfileModule } from './profile/profile.module';
-import { JobModule } from './job/job.module';
+import {SkillModule} from './skill/skill.module';
+import {ProfileModule} from './profile/profile.module';
+import {JobModule} from './job/job.module';
+import {ApplicationsModule} from './applications/applications.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JobModule } from './job/job.module';
     SkillModule,
     ProfileModule,
     JobModule,
+    ApplicationsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
