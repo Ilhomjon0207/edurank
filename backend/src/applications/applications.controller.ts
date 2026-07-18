@@ -17,10 +17,8 @@ export class ApplicationsController {
     }
 
     @Post()
-    create(@Body() createApplicationDto: CreateApplicationDto) {
-        const userId = 1;
-
-        return this.applicationsService.create(userId, createApplicationDto);
+    create(@CurrentUser() user,@Body() createApplicationDto: CreateApplicationDto) {
+        return this.applicationsService.create(user.id, createApplicationDto);
     }
 
     @Get()
@@ -52,9 +50,7 @@ export class ApplicationsController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        const userId = 1;
-
-        return this.applicationsService.remove(+id, userId);
+    remove(@CurrentUser() user,@Param('id') id: string) {
+        return this.applicationsService.remove(+id, user.id);
     }
 }
