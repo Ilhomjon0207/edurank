@@ -12,6 +12,7 @@ import {SkillModule} from './skill/skill.module';
 import {ProfileModule} from './profile/profile.module';
 import {JobModule} from './job/job.module';
 import {ApplicationsModule} from './applications/applications.module';
+import { CriterionModule } from './criterion/criterion.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {ApplicationsModule} from './applications/applications.module';
     ProfileModule,
     JobModule,
     ApplicationsModule,
+    CriterionModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,

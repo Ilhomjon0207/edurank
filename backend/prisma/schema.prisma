@@ -140,3 +140,10 @@ enum Role {
   TEACHER
   ADMIN
 }
+
+enum CriterionType {
+  GPA
+  SKILL
+  EXPERIENCE
+  JOB_MATCH
+}
