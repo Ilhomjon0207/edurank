@@ -7,6 +7,7 @@ import {
     Job,
 } from '@prisma/client';
 
+import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 import {PrismaPg} from "@prisma/adapter-pg";
 import {Pool} from "pg";
@@ -111,7 +112,12 @@ async function main() {
 
 
     for (let i = 0; i < 100; i++) {
+        const plainPassword = faker.internet.password({
+            length: 12,
+            memorable: false,
+        });
 
+        const hashedPassword = await bcrypt.hash(plainPassword, 10);
         const student =
             await prisma.user.create({
 
@@ -124,7 +130,7 @@ async function main() {
                         faker.internet.email(),
 
                     password:
-                        '123456',
+                    hashedPassword,
 
                     role:
                     Role.STUDENT,

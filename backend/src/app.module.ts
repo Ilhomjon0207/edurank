@@ -13,6 +13,7 @@ import {ProfileModule} from './profile/profile.module';
 import {JobModule} from './job/job.module';
 import {ApplicationsModule} from './applications/applications.module';
 import { CriterionModule } from './criterion/criterion.module';
+import { RankingModule } from './ranking/ranking.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CriterionModule } from './criterion/criterion.module';
     JobModule,
     ApplicationsModule,
     CriterionModule,
+    RankingModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
