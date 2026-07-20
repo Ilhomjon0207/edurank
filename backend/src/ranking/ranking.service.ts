@@ -324,4 +324,49 @@ export class RankingService {
         }))
     }
 
+    async findMyRanking(userId: number) {
+
+        const ranking = await this.prisma.ranking.findUnique({
+
+            where: {
+                id: userId,
+            },
+
+            include: {
+                User: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        Profile: {
+                            select: {
+                                gpa: true,
+                                experienceMonths: true,
+                            },
+                        },
+                    },
+                },
+            },
+
+        });
+
+        console.log(ranking)
+        if (!ranking) {
+            throw new NotFoundException('Ranking not found');
+        }
+
+        return {
+            rank: ranking.rank,
+            score: Number(ranking.score.toFixed(2)),
+            calculatedAt: ranking.calculatedAt,
+
+            student: {
+                id: ranking.User.id,
+                name: ranking.User.name,
+                email: ranking.User.email,
+                gpa: ranking.User.Profile?.gpa,
+                experienceMonths: ranking.User.Profile?.experienceMonths,
+            },
+        };
+    }
 }

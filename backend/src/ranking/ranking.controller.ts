@@ -1,6 +1,7 @@
 import {Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query} from '@nestjs/common';
 import {RankingService} from './ranking.service';
 import {ApiBearerAuth} from "@nestjs/swagger";
+import {CurrentUser} from "../common/decorators";
 
 @ApiBearerAuth('JWT')
 @Controller('ranking')
@@ -27,6 +28,13 @@ export class RankingController {
   ) {
     return this.rankingService.findTop(limit);
   }
+  @Get('me')
+  myRanking(@CurrentUser() user ) {
+
+    console.log(user)
+    return this.rankingService.findMyRanking(user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.rankingService.findOne(+id);
