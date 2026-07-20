@@ -1,6 +1,5 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post} from '@nestjs/common';
+import {Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query} from '@nestjs/common';
 import {RankingService} from './ranking.service';
-import {UpdateRankingDto} from './dto/update-ranking.dto';
 import {ApiBearerAuth} from "@nestjs/swagger";
 
 @ApiBearerAuth('JWT')
@@ -17,11 +16,23 @@ export class RankingController {
   findAll() {
     return this.rankingService.findAll();
   }
-
+  @Get('top')
+  findTop(
+      @Query(
+          'limit',
+          new DefaultValuePipe(10),
+          ParseIntPipe,
+      )
+      limit: number,
+  ) {
+    return this.rankingService.findTop(limit);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.rankingService.findOne(+id);
   }
+
+
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateRankingDto: UpdateRankingDto) {

@@ -1,6 +1,4 @@
-import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import {CreateRankingDto} from './dto/create-ranking.dto';
-import {UpdateRankingDto} from './dto/update-ranking.dto';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {PrismaService} from "../prisma/prisma.service";
 
 @Injectable()
@@ -8,9 +6,6 @@ export class RankingService {
     constructor(private readonly prisma: PrismaService) {
     }
 
-    create(createRankingDto: CreateRankingDto) {
-        return 'This action adds a new ranking';
-    }
 
     async calculate(studentId: number) {
 
@@ -206,8 +201,8 @@ export class RankingService {
 
         for (let i = 0; i < rankings.length; i++) {
             await this.prisma.ranking.update({
-                where: { id: rankings[i].id },
-                data: { rank: i + 1 },
+                where: {id: rankings[i].id},
+                data: {rank: i + 1},
             });
         }
         return {
@@ -216,8 +211,64 @@ export class RankingService {
         };
     }
 
-    findAll() {
-        return this.prisma.ranking.findMany();
+    async findAll() {
+
+        const rankings = await this.prisma.ranking.findMany({
+
+            include: {
+
+                User: {
+
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+
+                        Profile: {
+                            select: {
+                                gpa: true,
+                                experienceMonths: true,
+                            },
+                        },
+                    },
+
+                },
+
+            },
+
+            orderBy: {
+                rank: 'asc',
+            },
+
+        });
+
+
+        return rankings.map(item => ({
+
+            rank: item.rank,
+
+            score: Number(item.score.toFixed(2)),
+
+            student: {
+
+                id: item.User.id,
+
+                name: item.User.name,
+
+                email: item.User.email,
+
+                gpa: item.User.Profile?.gpa,
+
+                experience:
+                item.User.Profile?.experienceMonths,
+
+            },
+
+            calculatedAt:
+            item.calculatedAt,
+
+        }));
+
     }
 
     async findOne(id: number) {
@@ -235,13 +286,42 @@ export class RankingService {
         return rank;
     }
 
-    update(id: number, updateRankingDto: UpdateRankingDto) {
-        return `This action updates a #${id} ranking`;
-    }
 
-    remove(id: number) {
-        return `This action removes a #${id} ranking`;
-    }
+    async findTop(limit: number = 10) {
+        const ranking = await this.prisma.ranking.findMany({
+            take: limit,
+            orderBy: {
+                rank: 'asc',
+            },
+            include: {
+                User: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        Profile: {
+                            select: {
+                                gpa: true,
+                                experienceMonths: true,
+                            }
+                        }
+                    }
+                }
+            }
 
+        })
+
+        return ranking.map(item => ({
+            rank: item.rank,
+            score: Number(item.score.toFixed(2)),
+            student: {
+                id: item.User.id,
+                name: item.User.name,
+                email: item.User.email,
+                gpa: Number(item.User.Profile?.gpa),
+                experience: Number(item.User.Profile?.experienceMonths),
+            }
+        }))
+    }
 
 }
