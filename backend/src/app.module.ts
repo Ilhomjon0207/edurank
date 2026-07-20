@@ -14,6 +14,7 @@ import {JobModule} from './job/job.module';
 import {ApplicationsModule} from './applications/applications.module';
 import { CriterionModule } from './criterion/criterion.module';
 import { RankingModule } from './ranking/ranking.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { RankingModule } from './ranking/ranking.module';
     ApplicationsModule,
     CriterionModule,
     RankingModule,
+    DashboardModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
