@@ -350,7 +350,7 @@ export class RankingService {
 
         });
 
-        console.log(ranking)
+
         if (!ranking) {
             throw new NotFoundException('Ranking not found');
         }
