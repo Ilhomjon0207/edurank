@@ -17,6 +17,7 @@ import { RankingModule } from './ranking/ranking.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { AiService } from './ai/ai.service';
+import { CandidatesModule } from './candidates/candidates.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AiService } from './ai/ai.service';
     RankingModule,
     DashboardModule,
     RecommendationsModule,
+    CandidatesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
