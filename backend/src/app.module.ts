@@ -15,6 +15,8 @@ import {ApplicationsModule} from './applications/applications.module';
 import { CriterionModule } from './criterion/criterion.module';
 import { RankingModule } from './ranking/ranking.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
+import { AiService } from './ai/ai.service';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     CriterionModule,
     RankingModule,
     DashboardModule,
+    RecommendationsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService,
@@ -40,7 +43,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     },{
     provide:APP_GUARD,
       useClass: RolesGuard,
-    }
+    }, AiService
 
     ],
 })
