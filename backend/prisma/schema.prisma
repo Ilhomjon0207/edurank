@@ -15,6 +15,7 @@ model User {
   createdAt   DateTime      @default(now())
   Application Application[]
   Log         Log[]
+  AiRecommendations AiRecommendation[]
   Profile     Profile?
   Ranking     Ranking[]
   Task        Task[]
@@ -53,6 +54,7 @@ model Job {
   minExperience Int?
   createdAt     DateTime      @default(now())
   Application   Application[]
+  AiRecommendations AiRecommendation[]
   JobSkill      JobSkill[]
   updatedAt     DateTime      @updatedAt
 }
@@ -146,4 +148,16 @@ enum CriterionType {
   SKILL
   EXPERIENCE
   JOB_MATCH
+}
+model AiRecommendation {
+  id             Int      @id @default(autoincrement())
+  jobId          Int
+  candidateId    Int
+  recommendation Json
+  createdAt      DateTime @default(now())
+
+  Job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  Candidate User @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, candidateId])
 }

@@ -27,6 +27,12 @@ export class JobController {
         return this.jobService.findOne(+id);
     }
 
+
+    @Get(':id/ranking')
+    getJobRanking(@Param('id') id: string) {
+        return this.jobService.getJobRanking(+id);
+    }
+
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto) {
         return this.jobService.update(+id, updateJobDto);

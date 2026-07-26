@@ -237,6 +237,7 @@ export class JobService {
 
 
     }
+
     async removeJobSkill(
         jobId: number,
         skillId: number,
@@ -263,5 +264,25 @@ export class JobService {
                 },
             },
         });
+    }
+
+    async getJobRanking(jobId: number) {
+
+        const jobRanking = await this.prisma.ranking.findMany({
+            where: {
+                id: jobId,
+            },
+            orderBy: {
+                score: 'desc'
+            },
+            include: {
+                User: true
+            }
+        });
+
+        if (!jobRanking) {
+            throw new NotFoundException('Job ranking not found');
+        }
+        return jobRanking;
     }
 }

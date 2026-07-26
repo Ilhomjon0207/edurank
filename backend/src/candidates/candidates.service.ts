@@ -192,6 +192,34 @@ export class CandidatesService {
 
         const bestCandidate = candidates[0];
 
+
+        const existingRecommendation =
+            await this.prisma.aiRecommendation.findUnique({
+                where: {
+                    jobId_candidateId: {
+                        jobId,
+                        candidateId: bestCandidate.studentId,
+                    },
+                },
+                include: {
+                    Candidate: {
+                        include: {
+                            Profile: true,
+                            UserSkill: {
+                                include: {
+                                    Skill: true,
+                                },
+                            },
+                        },
+                    },
+                    Job: true,
+                },
+            });
+
+        if (existingRecommendation) {
+            return existingRecommendation;
+        }
+
         const aiData = {
             candidate: {
                 name: bestCandidate.name,
@@ -218,6 +246,23 @@ export class CandidatesService {
 
         };
 
+            const aiResult=await  this.aiService.analyzeCandidates(aiData);
+        await this.prisma.aiRecommendation.upsert({
+            where: {
+                jobId_candidateId: {
+                    jobId,
+                    candidateId: bestCandidate.studentId,
+                },
+            },
+            update: {
+                recommendation: aiResult,
+            },
+            create: {
+                jobId,
+                candidateId: bestCandidate.studentId,
+                recommendation: aiResult,
+            },
+        });
 
         return this.aiService.analyzeCandidates(aiData);
 
