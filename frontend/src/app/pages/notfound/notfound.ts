@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import {FloatingConfigurator} from "@/app/layout/floating-configurator/floating-configurator";
+
 
 @Component({
     selector: 'app-notfound',
     standalone: true,
-    imports: [RouterModule, AppFloatingConfigurator, ButtonModule],
+    imports: [RouterModule, FloatingConfigurator, ButtonModule],
     template: ` <app-floating-configurator />
         <div class="flex items-center justify-center min-h-screen overflow-hidden">
             <div class="flex flex-col items-center justify-center">
