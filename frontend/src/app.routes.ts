@@ -1,9 +1,9 @@
 import {Routes} from '@angular/router';
-import {Dashboard} from './app/pages/dashboard/dashboard';
 import {Documentation} from './app/pages/documentation/documentation';
 import {Landing} from './app/pages/landing/landing';
 import {Notfound} from './app/pages/notfound/notfound';
 import {MainLayout} from "@/app/layout/main-layout/main-layout";
+import {Dashboard} from "@/app/features/dashboard/dashboard";
 
 export const appRoutes: Routes = [
     {
