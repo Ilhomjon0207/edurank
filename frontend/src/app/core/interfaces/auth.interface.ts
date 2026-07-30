@@ -5,7 +5,7 @@ export interface ILoginRequest {
 
 
 export interface ILoginResponse {
-    accessToken: string;
+    access_token: string;
     user: {
         id: number;
         email: string;

@@ -13,9 +13,9 @@ export class AuthService {
 
 
     login(data: ILoginRequest): Observable<ILoginResponse> {
-        return this.http.post<ILoginResponse>(`${environment.apiUrl}/login`, data).pipe(
+        return this.http.post<ILoginResponse>(`${environment.apiUrl}/auth/login`, data).pipe(
             tap(res => {
-                localStorage.setItem('accessToken', res.accessToken);
+                localStorage.setItem('accessToken', res.access_token);
                 localStorage.setItem('user', JSON.stringify(res.user));
             })
         )
