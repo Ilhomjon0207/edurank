@@ -10,6 +10,8 @@ import {Image} from "primeng/image";
 import {AuthService} from "@/app/core/services/auth.service";
 import {ILoginRequest} from "@/app/core/interfaces";
 import {Router} from "@angular/router";
+import {MessageService} from "primeng/api";
+import {Toast} from "primeng/toast";
 
 @Component({
     selector: 'app-login',
@@ -21,8 +23,10 @@ import {Router} from "@angular/router";
         InputText,
         Password,
         Image,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        Toast
     ],
+    providers: [MessageService],
     templateUrl: './login.html',
     styleUrl: './login.scss',
 })
@@ -32,6 +36,7 @@ export class Login {
     password: string = '';
 
     checked: boolean = false;
+    private messageService=inject(MessageService);
     private layoutService = inject(LayoutService);
     private authService = inject(AuthService);
     private router=inject(Router)
@@ -46,10 +51,15 @@ export class Login {
 
     login() {
         const request = this.loginForm.getRawValue() as ILoginRequest;
-        console.log(request);
         this.authService.login(request).subscribe({
             next:(res)=>{
                 this.router.navigateByUrl('/');
+            },
+            error:(err)=>{
+                this.messageService.add({
+                    severity:'error',
+                    summary:err.error.message
+                })
             }
         })
     }
