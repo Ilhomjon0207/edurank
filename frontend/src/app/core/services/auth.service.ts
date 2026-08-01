@@ -63,7 +63,6 @@ export class AuthService {
     }
 
     saveTokens(res: ILoginResponse) {
-        console.log(res)
         localStorage.setItem('accessToken', res.access_token);
         localStorage.setItem('user', JSON.stringify(res.user));
         localStorage.setItem('refresh_token',res.refresh_token)
