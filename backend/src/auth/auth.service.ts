@@ -2,10 +2,11 @@ import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PrismaService} from "../prisma/prisma.service";
 import * as bcrypt from 'bcrypt';
 import {JwtService} from "@nestjs/jwt";
+
 @Injectable()
 export class AuthService {
 
-    constructor(private prisma: PrismaService,private readonly jwtService: JwtService) {
+    constructor(private prisma: PrismaService, private readonly jwtService: JwtService) {
 
     }
 
@@ -24,13 +25,13 @@ export class AuthService {
             },
         });
 
-        const { password, ...result } = user;
+        const {password, ...result} = user;
 
         return result;
     }
 
     async login(email: string, password: string) {
-        const user=await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: {
                 email: email
             }
@@ -40,16 +41,16 @@ export class AuthService {
             throw new UnauthorizedException('Email or password is incorrect');
         }
 
-        const passwordMatch=await bcrypt.compare(password, user.password);
-
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        const accessExpiresIn = 15 * 60 * 1000;
         if (!passwordMatch) {
             throw new UnauthorizedException('Email or password is incorrect');
         }
 
         const payload = {
-            sub:user.id,
+            sub: user.id,
             email: user.email,
-            role:user.role,
+            role: user.role,
         }
         const safeUser = {
             id: user.id,
@@ -58,14 +59,58 @@ export class AuthService {
             role: user.role,
         };
         return {
-            access_token:this.jwtService.sign(payload,{
+            access_token: this.jwtService.sign(payload, {
                 expiresIn: '15m'
             }),
-            refresh_token:this.jwtService.sign(payload,{
+            refresh_token: this.jwtService.sign(payload, {
                 expiresIn: '7d',
-                secret:process.env.JWT_SECRET
+                secret: process.env.JWT_REFRESH_SECRET,
             }),
-            user:safeUser,
+            user: safeUser,
+            expiresAt: Date.now() + accessExpiresIn,
+        }
+    }
+
+    async refresh(refreshToken: string) {
+        try {
+            const payload = await this.jwtService.verify(refreshToken, {
+                secret: process.env.JWT_SECRET
+            })
+
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: payload.id
+                }
+            })
+
+            if (!user) {
+                throw new UnauthorizedException();
+
+            }
+
+            const safeUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+
+            const accessToken = this.jwtService.sign({
+                    sub: user.id,
+                    email: user.email,
+                    role: user.role,
+                }, {
+                    expiresIn: '15m',
+                }
+            );
+
+            return {
+                accessToken: accessToken,
+                expiresIn: 900,
+                user: safeUser,
+            }
+        }catch {
+            throw new UnauthorizedException('Invalid refresh token');
         }
     }
 }

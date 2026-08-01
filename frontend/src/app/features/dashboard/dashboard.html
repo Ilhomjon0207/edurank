@@ -1,15 +1,42 @@
 <div class="grid grid-cols-12 gap-8">
-    <app-stats-widget title="Students" [count]="statistics()!.students" icon="pi-users"  class="contents"/>
-    <app-stats-widget title="Jobs" [count]="statistics()!.jobs" icon="pi-briefcase"  class="contents"/>
-    <app-stats-widget title="Applications" [count]="statistics()!.applications" icon="pi-file"  class="contents"/>
-    <app-stats-widget title="Average Score" [count]="statistics()!.averageScore"  icon="pi-chart-line" class="contents"/>
+    <app-stats-widget
+        title="Students"
+        [count]="statistics()?.students ?? 0"
+        icon="pi-users"
+        class="contents" />
+
+    <app-stats-widget
+        title="Jobs"
+        [count]="statistics()?.jobs ?? 0"
+        icon="pi-briefcase"
+        class="contents" />
+
+    <app-stats-widget
+        title="Applications"
+        [count]="statistics()?.applications ?? 0"
+        icon="pi-file"
+        class="contents" />
+
+    <app-stats-widget
+        title="Average Score"
+        [count]="statistics()?.averageScore ?? 0"
+        icon="pi-chart-line"
+        class="contents" />
 
     <div class="col-span-12 xl:col-span-6">
-        <app-stats-widget title="Highest Score" [count]="statistics()!.highestScore" icon="pi-trophy"  class="contents"/>
-
+        <app-stats-widget
+            title="Highest Score"
+            [count]="statistics()?.highestScore ?? 0"
+            icon="pi-trophy"
+            class="contents" />
     </div>
+
     <div class="col-span-12 xl:col-span-6">
-        <app-stats-widget title="Lowest Score" [count]="statistics()!.lowestScore " icon="pi-chart-line"  class="contents"/>
+        <app-stats-widget
+            title="Lowest Score"
+            [count]="statistics()?.lowestScore ?? 0"
+            icon="pi-chart-line"
+            class="contents" />
     </div>
 
         <div class="col-span-6">

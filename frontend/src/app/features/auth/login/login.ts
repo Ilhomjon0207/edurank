@@ -56,10 +56,11 @@ export class Login {
                 this.router.navigateByUrl('/');
             },
             error:(err)=>{
-                this.messageService.add({
-                    severity:'error',
-                    summary:err.error.message
-                })
+                console.log(err)
+                // this.messageService.add({
+                //     severity:'error',
+                //     summary:err
+                // })
             }
         })
     }

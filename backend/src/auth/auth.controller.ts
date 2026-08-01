@@ -29,4 +29,10 @@ export class AuthController {
     ) {
         return req.user;
     }
+
+    @Post('refresh')
+    @Public()
+    refresh(@Body() body :{refreshToken:string}) {
+        return this.authService.refresh(body.refreshToken);
+    }
 }

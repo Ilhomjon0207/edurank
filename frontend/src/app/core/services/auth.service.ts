@@ -15,8 +15,11 @@ export class AuthService {
     login(data: ILoginRequest): Observable<ILoginResponse> {
         return this.http.post<ILoginResponse>(`${environment.apiUrl}/auth/login`, data).pipe(
             tap(res => {
+                console.log(res)
                 localStorage.setItem('accessToken', res.access_token);
                 localStorage.setItem('user', JSON.stringify(res.user));
+                localStorage.setItem('expiredAt', String(res.expiresAt));
+                localStorage.setItem('refreshToken', String(res.refresh_token));
             })
         )
     }
@@ -26,11 +29,43 @@ export class AuthService {
         localStorage.removeItem('user');
     }
 
-    get token() {
+    getAccessToken() {
         return localStorage.getItem('accessToken');
+    }
+   getRefreshToken() {
+        return localStorage.getItem('refreshToken');
     }
 
     isLoggedIn() {
-        return !!this.token;
+        return !!this.getAccessToken();
+    }
+    isAccessTokenExpired(): boolean {
+        const expiresAt = Number(localStorage.getItem('expiredAt'));
+
+        if (!expiresAt) {
+            return true;
+        }
+
+        return Date.now() >= expiresAt;
+    }
+    refreshToken(): Observable<ILoginResponse> {
+        const refreshToken = localStorage.getItem('refresh_token');
+
+        return this.http.post<ILoginResponse>(
+            `${environment.apiUrl}/auth/refresh`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${refreshToken}`,
+                },
+            },
+        );
+    }
+
+    saveTokens(res: ILoginResponse) {
+        console.log(res)
+        localStorage.setItem('accessToken', res.access_token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+        localStorage.setItem('refresh_token',res.refresh_token)
     }
 }

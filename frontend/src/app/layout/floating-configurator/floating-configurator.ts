@@ -3,13 +3,11 @@ import {Component, computed, inject, input} from '@angular/core';
 import {Button} from "primeng/button";
 import {StyleClass} from "primeng/styleclass";
 import {LayoutService} from "@/app/layout/service/layout.service";
-import {Configurator} from "@/app/layout/configurator/configurator";
 import {NgClass} from "@angular/common";
 
 @Component({
   selector: 'app-floating-configurator',
     imports: [
-        Configurator,
         Button,
         StyleClass,
         NgClass
