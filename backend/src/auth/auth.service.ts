@@ -43,6 +43,8 @@ export class AuthService {
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         const accessExpiresIn = 15 * 60 * 1000;
+
+
         if (!passwordMatch) {
             throw new UnauthorizedException('Email or password is incorrect');
         }
@@ -58,31 +60,50 @@ export class AuthService {
             email: user.email,
             role: user.role,
         };
+
+        const access_token = this.jwtService.sign(payload, {
+            expiresIn: '15m',
+            secret: process.env.JWT_SECRET,
+        });
+
+        const refresh_token = this.jwtService.sign(payload, {
+            expiresIn: '7d',
+            secret: process.env.JWT_REFRESH_SECRET,
+        })
+        try {
+
+            const updatedUser = await this.prisma.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    refreshToken: refresh_token,
+                },
+            });
+        } catch (e) {
+            console.error(e);
+        }
         return {
-            access_token: this.jwtService.sign(payload, {
-                expiresIn: '15m'
-            }),
-            refresh_token: this.jwtService.sign(payload, {
-                expiresIn: '7d',
-                secret: process.env.JWT_REFRESH_SECRET,
-            }),
+            access_token,
+            refresh_token,
             user: safeUser,
             expiresAt: Date.now() + accessExpiresIn,
         }
     }
 
     async refresh(refreshToken: string) {
+
         try {
             const payload = await this.jwtService.verify(refreshToken, {
-                secret: process.env.JWT_SECRET
+                secret: process.env.JWT_REFRESH_SECRET
             })
+
 
             const user = await this.prisma.user.findUnique({
                 where: {
-                    id: payload.id
+                    id: payload.sub
                 }
             })
-
             if (!user) {
                 throw new UnauthorizedException();
 
@@ -109,8 +130,26 @@ export class AuthService {
                 expiresIn: 900,
                 user: safeUser,
             }
-        }catch {
-            throw new UnauthorizedException('Invalid refresh token');
+        } catch (e) {
+            console.error('Refresh error:', e);
+            throw new UnauthorizedException(e.message);
         }
+    }
+
+    async logout(userId: number) {
+
+
+        await this.prisma.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                refreshToken: null,
+            },
+        });
+
+        return {
+            message: 'Logged out successfully',
+        };
     }
 }

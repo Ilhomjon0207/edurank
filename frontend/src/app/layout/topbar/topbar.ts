@@ -34,9 +34,12 @@ export class Topbar {
             darkTheme: !state.darkTheme
         }));
     }
-    logout(){
-    this.authService.logout();
-        this.router.navigate(['/auth/login']);
+    logout() {
+        this.authService.logout().subscribe({
+            next: () => {
+                this.router.navigateByUrl('/auth/login');
+            }
+        });
     }
 
 }

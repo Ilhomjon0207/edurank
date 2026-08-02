@@ -15,7 +15,6 @@ export class AuthService {
     login(data: ILoginRequest): Observable<ILoginResponse> {
         return this.http.post<ILoginResponse>(`${environment.apiUrl}/auth/login`, data).pipe(
             tap(res => {
-                console.log(res)
                 localStorage.setItem('accessToken', res.access_token);
                 localStorage.setItem('user', JSON.stringify(res.user));
                 localStorage.setItem('expiredAt', String(res.expiresAt));
@@ -24,11 +23,20 @@ export class AuthService {
         )
     }
 
-    logout() {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-    }
+    logout(): Observable<any> {
+        return this.http.post(
+            `${environment.apiUrl}/auth/logout`,
+            {}
+        ).pipe(
+            tap(() => {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                localStorage.removeItem('expiredAt');
+            })
+        );
 
+    }
     getAccessToken() {
         return localStorage.getItem('accessToken');
     }
@@ -49,16 +57,14 @@ export class AuthService {
         return Date.now() >= expiresAt;
     }
     refreshToken(): Observable<ILoginResponse> {
-        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshToken = localStorage.getItem('refreshToken');
 
         return this.http.post<ILoginResponse>(
             `${environment.apiUrl}/auth/refresh`,
-            {},
             {
-                headers: {
-                    Authorization: `Bearer ${refreshToken}`,
-                },
+                refreshToken: refreshToken,
             },
+
         );
     }
 
