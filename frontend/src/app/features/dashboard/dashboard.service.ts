@@ -29,4 +29,8 @@ export class DashboardService extends BaseCrudService<IDashboard, any, any>{
             }
         );
     }
+
+    getRecentApplications(limit=10){
+        return
+    }
 }

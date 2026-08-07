@@ -89,5 +89,18 @@ export class ApplicationsService {
         })
     }
 
-
+        async getRecentApplication(limit: number=5) {
+            console.log(limit)
+            const recents= await this.prisma.application.findMany({
+               take: limit,
+                orderBy: {
+                    appliedAt: 'desc',
+                },
+                include: {
+                   User:true,
+                    Job:true
+                   }
+            })
+            return recents;
+        }
 }

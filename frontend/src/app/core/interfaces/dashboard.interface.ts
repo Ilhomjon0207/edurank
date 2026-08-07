@@ -9,3 +9,11 @@ export interface IDashboard {
     pendingApplications: number,
     rejectedApplications: number,
 }
+
+
+
+
+
+
+
+

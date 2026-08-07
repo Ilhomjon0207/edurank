@@ -36,11 +36,15 @@ export class ApplicationsController {
         );
 
     }
-
+    @Get('recent/:id')
+    getRecentApplications(@Param('id') id: string) {
+        return this.applicationsService.getRecentApplication(Number(id));
+    }
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.applicationsService.findOne(+id);
     }
+
 
 
     @Patch(':id')
