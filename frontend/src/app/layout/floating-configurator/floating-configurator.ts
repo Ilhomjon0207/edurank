@@ -6,14 +6,11 @@ import {LayoutService} from "@/app/layout/service/layout.service";
 import {NgClass} from "@angular/common";
 
 @Component({
-  selector: 'app-floating-configurator',
-    imports: [
-        Button,
-        StyleClass,
-        NgClass
-    ],
-  templateUrl: './floating-configurator.html',
-  styleUrl: './floating-configurator.scss',
+    selector: 'app-floating-configurator',
+    imports: [Button, StyleClass, NgClass],
+    templateUrl: './floating-configurator.html',
+    styleUrl: './floating-configurator.scss',
+    standalone: true
 })
 export class FloatingConfigurator {
     LayoutService = inject(LayoutService);
@@ -25,5 +22,4 @@ export class FloatingConfigurator {
     toggleDarkMode() {
         this.LayoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
-
 }

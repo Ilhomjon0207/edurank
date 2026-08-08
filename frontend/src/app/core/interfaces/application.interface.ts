@@ -10,3 +10,11 @@ export interface IRecentApplication {
     User: IUser;
     Job: IJob;
 }
+
+export interface IRecentApplicationResponse {
+    id: number;
+    status: ApplicationStatus;
+    student:string;
+    jobName: string;
+
+}
