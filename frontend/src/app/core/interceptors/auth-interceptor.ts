@@ -31,6 +31,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     if (refreshToken) {
         return auth.refreshToken().pipe(
             switchMap((res) => {
+                console.log(res);
                 auth.saveTokens(res);
 
                 return next(

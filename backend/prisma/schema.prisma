@@ -54,10 +54,12 @@ model Job {
   deadline      DateTime?
   minExperience Int?
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
   Application   Application[]
   AiRecommendations AiRecommendation[]
   JobSkill      JobSkill[]
-  updatedAt     DateTime      @updatedAt
+  Ranking       Ranking[]
 }
 
 model JobSkill {
@@ -91,15 +93,19 @@ model Profile {
 
 model Ranking {
   id           Int      @id @default(autoincrement())
+  jobId        Int
   studentId    Int
   score        Float
   rank         Int?
   calculatedAt DateTime @default(now())
-  User         User     @relation(fields: [studentId], references: [id])
 
+  Job          Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  User         User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, studentId])
+  @@index([jobId])
   @@index([studentId])
 }
-
 model Skill {
   id          Int         @id @default(autoincrement())
   name        String      @unique
