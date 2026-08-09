@@ -87,7 +87,7 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
-    console.log(refreshToken);
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const payload = await this.jwtService.verify(refreshToken, {
@@ -128,7 +128,6 @@ export class AuthService {
         user: safeUser,
       };
     } catch (e) {
-      console.error('Refresh error:', e);
       throw new UnauthorizedException(e);
     }
   }
