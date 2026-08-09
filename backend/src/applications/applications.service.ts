@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,11 +12,41 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ApplicationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(userId: number, dto: CreateApplicationDto) {
+  async create(userId: number, dto: CreateApplicationDto) {
+    const job = await this.prisma.job.findUnique({
+      where: {
+        id: dto.jobId,
+      },
+    });
+
+    if (!job) {
+      throw new NotFoundException(`Job with ID ${dto.jobId} not found`);
+    }
+
+    if (job.deadline && job.deadline < new Date()) {
+      throw new BadRequestException('The application deadline has passed');
+    }
+
+    const existingApplication = await this.prisma.application.findUnique({
+      where: {
+        userId_jobId: {
+          userId,
+          jobId: dto.jobId,
+        },
+      },
+    });
+
+    if (existingApplication) {
+      throw new ConflictException('You have already applied for this job');
+    }
+
     return this.prisma.application.create({
       data: {
         userId,
-        jobId: dto.JobId,
+        jobId: dto.jobId,
+      },
+      include: {
+        Job: true,
       },
     });
   }

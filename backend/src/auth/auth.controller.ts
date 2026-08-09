@@ -1,50 +1,57 @@
-import {Body, Controller,Headers ,Get, Post, Req, UseGuards} from '@nestjs/common';
-import {AuthService} from "./auth.service";
-import {RegisterDto} from "./dto/register.dto";
-import {LoginDto} from "./dto/login.dto";
-import {JwtAuthGuard} from "./guards/jwt.guard";
-import express from 'express'
-import {Public} from "../common/decorators/public.decorator";
-import {ApiBearerAuth} from "@nestjs/swagger";
-import {RefreshDto} from "./dto/refresh.dto";
+import {
+  Body,
+  Controller,
+  Headers,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import express from 'express';
+import { Public } from '../common/decorators/public.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { RefreshDto } from './dto/refresh.dto';
+import { CurrentUser } from '../common/decorators';
 
 @ApiBearerAuth('JWT')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {
-    }
+  constructor(private readonly authService: AuthService) {}
+  @Public()
+  @Post('register')
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
 
-    @Post('register')
-    register(@Body() dto: RegisterDto) {
-        return this.authService.register(dto);
-    }
+  @Public()
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto.email, dto.password);
+  }
 
-    @Public()
-    @Post('login')
-    login(@Body() dto: LoginDto) {
-        return this.authService.login(dto.email, dto.password);
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@CurrentUser() user) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return user;
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Get('me')
-    me(
-        @Req() req: any,
-    ) {
-        return req.user;
-    }
+  @Post('refresh')
+  @Public()
+  refresh(@Body() body: RefreshDto) {
+    console.log(body);
+    return this.authService.refresh(body.refreshToken);
+  }
 
-    @Post('refresh')
-    @Public()
-    refresh(@Body() body: RefreshDto) {
-        console.log(body);
-        return this.authService.refresh(body.refreshToken);
-    }
-
-    @Post('logout')
-    @UseGuards(JwtAuthGuard)
-    logout(@Req() req: express.Request) {
-        const user = req as any;
-        console.log(user.user);
-        return this.authService.logout(user.user.id);
-    }
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  logout(@Req() req: express.Request) {
+    const user = req as any;
+    console.log(user.user);
+    return this.authService.logout(user.user.id);
+  }
 }
