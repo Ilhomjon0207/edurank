@@ -57,12 +57,12 @@ export class AuthService {
       role: user.role,
     };
 
-    const access_token = this.jwtService.sign(payload, {
+    const accessToken = this.jwtService.sign(payload, {
       expiresIn: '15m',
       secret: process.env.JWT_SECRET,
     });
 
-    const refresh_token = this.jwtService.sign(payload, {
+    const refreshToken = this.jwtService.sign(payload, {
       expiresIn: '7d',
       secret: process.env.JWT_REFRESH_SECRET,
     });
@@ -72,28 +72,27 @@ export class AuthService {
           id: user.id,
         },
         data: {
-          refreshToken: refresh_token,
+          refreshToken: refreshToken,
         },
       });
     } catch (e) {
       console.error(e);
     }
     return {
-      access_token,
-      refresh_token,
+      accessToken,
+      refreshToken,
       user: safeUser,
       expiresAt: Date.now() + accessExpiresIn,
     };
   }
 
   async refresh(refreshToken: string) {
-
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const payload = await this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
-
+      const accessExpiresIn = 15 * 60 * 1000;
       const user = await this.prisma.user.findUnique({
         where: {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
@@ -124,7 +123,7 @@ export class AuthService {
 
       return {
         accessToken: accessToken,
-        expiresIn: 900,
+        expiresAt: Date.now() + accessExpiresIn,
         user: safeUser,
       };
     } catch (e) {
