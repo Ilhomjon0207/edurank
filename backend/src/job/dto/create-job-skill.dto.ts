@@ -1,11 +1,10 @@
-import {IsInt, Min} from "class-validator";
+import { IsString, Min } from 'class-validator';
 
 export class CreateJobSkillDTO {
-    @IsInt()
-    skillId: number;
+  @IsString()
+  skillId: string;
 
-
-    @IsInt()
-    @Min(1)
-    requiredLevel: number;
+  @IsString()
+  @Min(1)
+  requiredLevel: number;
 }

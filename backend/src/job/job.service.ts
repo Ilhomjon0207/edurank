@@ -1,288 +1,271 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {CreateJobDto} from './dto/create-job.dto';
-import {UpdateJobDto} from './dto/update-job.dto';
-import {PrismaService} from "../prisma/prisma.service";
-import {CreateJobSkillDTO} from "./dto/create-job-skill.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateJobDto } from './dto/create-job.dto';
+import { UpdateJobDto } from './dto/update-job.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateJobSkillDTO } from './dto/create-job-skill.dto';
 
 @Injectable()
 export class JobService {
+  constructor(private readonly prisma: PrismaService) {}
 
-    constructor(private readonly prisma: PrismaService) {
+  async create(createJobDto: CreateJobDto) {
+    return this.prisma.job.create({
+      data: {
+        title: createJobDto.title,
+        description: createJobDto.description,
+        minGpa: createJobDto.minGpa,
+        deadline: createJobDto.deadline,
+        minExperience: createJobDto.minExperience,
+
+        JobSkill: {
+          create: createJobDto.skills?.map((skill) => ({
+            skillId: skill.skillId,
+            requiredLevel: skill.requiredLevel,
+          })),
+        },
+      },
+      include: {
+        JobSkill: {
+          include: {
+            Skill: true,
+          },
+        },
+      },
+    });
+  }
+
+  findAll() {
+    return this.prisma.job.findMany({
+      include: {
+        JobSkill: {
+          include: {
+            Skill: true,
+          },
+        },
+        Application: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async findOne(id: string) {
+    const job = await this.prisma.job.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        JobSkill: {
+          include: {
+            Skill: true,
+          },
+        },
+      },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
     }
 
-    async create(createJobDto: CreateJobDto) {
-        return this.prisma.job.create({
-            data: {
-                title: createJobDto.title,
-                description: createJobDto.description,
-                minGpa: createJobDto.minGpa,
-                deadline: createJobDto.deadline,
-                minExperience: createJobDto.minExperience,
+    return job;
+  }
 
-                JobSkill: {
-                    create: createJobDto.skills?.map((skill) => ({
-                        skillId: skill.skillId,
-                        requiredLevel: skill.requiredLevel,
-                    })),
-                },
-            },
+  async update(id: string, dto: UpdateJobDto) {
+    const job = await this.prisma.job.findUnique({
+      where: { id },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.job.update({
+        where: { id },
+        data: {
+          title: dto.title,
+          description: dto.description,
+          minGpa: dto.minGpa,
+          deadline: dto.deadline,
+          minExperience: dto.minExperience,
+        },
+      });
+
+      if (dto.skills) {
+        await tx.jobSkill.deleteMany({
+          where: {
+            jobId: id,
+          },
+        });
+
+        await tx.jobSkill.createMany({
+          data: dto.skills.map((skill) => ({
+            jobId: id,
+            skillId: skill.skillId,
+            requiredLevel: skill.requiredLevel,
+          })),
+        });
+      }
+
+      return tx.job.findUnique({
+        where: { id },
+        include: {
+          JobSkill: {
             include: {
-                JobSkill: {
-                    include: {
-                        Skill: true,
-                    },
-                },
+              Skill: true,
             },
-        });
+          },
+        },
+      });
+    });
+  }
+
+  remove(id: string) {
+    return this.prisma.job.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async addJobSkill(jobId: string, dto: CreateJobSkillDTO) {
+    const job = await this.prisma.job.findUnique({
+      where: {
+        id: jobId,
+      },
+    });
+
+    if (!job) {
+      throw new NotFoundException('Job not found');
     }
 
-    findAll() {
+    const skill = await this.prisma.skill.findUnique({
+      where: {
+        id: dto.skillId,
+      },
+    });
 
-
-        return this.prisma.job.findMany({
-            include: {
-                JobSkill: {
-                    include: {
-                        Skill: true
-                    }
-                },
-                Application: true,
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
     }
 
-    async findOne(id: number) {
+    const exists = await this.prisma.jobSkill.findUnique({
+      where: {
+        jobId_skillId: {
+          jobId: jobId,
+          skillId: dto.skillId,
+        },
+      },
+    });
 
-        const job = await this.prisma.job.findUnique({
-            where: {
-                id
-            },
-            include: {
-                JobSkill: {
-                    include: {
-                        Skill: true
-                    }
-                }
-            }
-        })
-
-        if (!job) {
-            throw new NotFoundException('Job not found');
-        }
-
-        return job;
+    if (exists) {
+      throw new NotFoundException('Skill already added');
     }
 
-    async update(id: number, dto: UpdateJobDto) {
-        const job = await this.prisma.job.findUnique({
-            where: {id},
-        });
+    return this.prisma.jobSkill.create({
+      data: {
+        jobId: jobId,
+        skillId: dto.skillId,
+        requiredLevel: dto.requiredLevel,
+      },
+      include: {
+        Skill: true,
+      },
+    });
+  }
 
-        if (!job) {
-            throw new NotFoundException('Job not found');
-        }
+  async getJobSkills(jobId: string) {
+    const job = await this.prisma.job.findUnique({
+      where: {
+        id: jobId,
+      },
+    });
 
-        return this.prisma.$transaction(async (tx) => {
-            await tx.job.update({
-                where: {id},
-                data: {
-                    title: dto.title,
-                    description: dto.description,
-                    minGpa: dto.minGpa,
-                    deadline: dto.deadline,
-                    minExperience: dto.minExperience,
-                },
-            });
-
-            if (dto.skills) {
-                await tx.jobSkill.deleteMany({
-                    where: {
-                        jobId: id,
-                    },
-                });
-
-                await tx.jobSkill.createMany({
-                    data: dto.skills.map((skill) => ({
-                        jobId: id,
-                        skillId: skill.skillId,
-                        requiredLevel: skill.requiredLevel,
-                    })),
-                });
-            }
-
-            return tx.job.findUnique({
-                where: {id},
-                include: {
-                    JobSkill: {
-                        include: {
-                            Skill: true,
-                        },
-                    },
-                },
-            });
-        });
+    if (!job) {
+      throw new NotFoundException('Job not found');
     }
 
-    remove(id: number) {
+    return this.prisma.jobSkill.findMany({
+      where: {
+        jobId: jobId,
+      },
+      include: {
+        Skill: true,
+      },
+    });
+  }
 
+  async updateJobSkill(jobId: string, skillId: string, requiredLevel: number) {
+    const jobSkill = await this.prisma.jobSkill.findUnique({
+      where: {
+        jobId_skillId: {
+          jobId: jobId,
+          skillId: skillId,
+        },
+      },
+    });
 
-        return this.prisma.job.delete({
-            where: {
-                id
-            }
-        });
+    if (!jobSkill) {
+      throw new NotFoundException('Job Skill not found');
     }
 
-    async addJobSkill(jobId: number, dto: CreateJobSkillDTO) {
+    return this.prisma.jobSkill.update({
+      where: {
+        jobId_skillId: {
+          jobId: jobId,
+          skillId: skillId,
+        },
+      },
+      data: {
+        requiredLevel: requiredLevel,
+      },
+      include: {
+        Skill: true,
+      },
+    });
+  }
 
-        const job = await this.prisma.job.findUnique({
-            where: {
-                id: jobId
-            }
-        })
+  async removeJobSkill(jobId: string, skillId: string) {
+    const jobSkill = await this.prisma.jobSkill.findUnique({
+      where: {
+        jobId_skillId: {
+          jobId,
+          skillId,
+        },
+      },
+    });
 
-        if (!job) {
-            throw new NotFoundException('Job not found');
-        }
-
-        const skill = await this.prisma.skill.findUnique({
-            where: {
-                id: dto.skillId,
-            }
-        })
-
-        if (!skill) {
-            throw new NotFoundException('Skill not found');
-        }
-
-        const exists = await this.prisma.jobSkill.findUnique({
-            where: {
-                jobId_skillId: {
-                    jobId: jobId,
-                    skillId: dto.skillId,
-                }
-            }
-        })
-
-        if (exists) {
-            throw new NotFoundException('Skill already added');
-        }
-
-        return this.prisma.jobSkill.create({
-            data: {
-                jobId: jobId,
-                skillId: dto.skillId,
-                requiredLevel: dto.requiredLevel,
-            },
-            include: {
-                Skill: true,
-            }
-        })
+    if (!jobSkill) {
+      throw new NotFoundException('Job skill not found');
     }
 
-    async getJobSkills(jobId: number) {
-        const job = await this.prisma.job.findUnique({
-            where: {
-                id: jobId,
-            }
-        })
+    return this.prisma.jobSkill.delete({
+      where: {
+        jobId_skillId: {
+          jobId,
+          skillId,
+        },
+      },
+    });
+  }
 
-        if (!job) {
-            throw new NotFoundException('Job not found');
+  async getJobRanking(jobId: string) {
+    const jobRanking = await this.prisma.ranking.findMany({
+      where: {
+        id: jobId,
+      },
+      orderBy: {
+        score: 'desc',
+      },
+      include: {
+        User: true,
+      },
+    });
 
-        }
-
-        return this.prisma.jobSkill.findMany({
-            where: {
-                jobId: jobId,
-            },
-            include: {
-                Skill: true,
-            }
-        })
+    if (!jobRanking) {
+      throw new NotFoundException('Job ranking not found');
     }
-
-    async updateJobSkill(jobId: number, skillId: number, requiredLevel: number) {
-
-        const jobSkill = await this.prisma.jobSkill.findUnique({
-            where: {
-                jobId_skillId: {
-                    jobId: jobId,
-                    skillId: skillId,
-                }
-            }
-        })
-
-        if (!jobSkill) {
-            throw new NotFoundException('Job Skill not found');
-        }
-
-        return this.prisma.jobSkill.update({
-            where: {
-                jobId_skillId: {
-                    jobId: jobId,
-                    skillId: skillId,
-                }
-            },
-            data: {
-                requiredLevel: requiredLevel,
-            },
-            include: {
-                Skill: true,
-            }
-        })
-
-
-    }
-
-    async removeJobSkill(
-        jobId: number,
-        skillId: number,
-    ) {
-
-        const jobSkill = await this.prisma.jobSkill.findUnique({
-            where: {
-                jobId_skillId: {
-                    jobId,
-                    skillId,
-                },
-            },
-        });
-
-        if (!jobSkill) {
-            throw new NotFoundException('Job skill not found');
-        }
-
-        return this.prisma.jobSkill.delete({
-            where: {
-                jobId_skillId: {
-                    jobId,
-                    skillId,
-                },
-            },
-        });
-    }
-
-    async getJobRanking(jobId: number) {
-
-        const jobRanking = await this.prisma.ranking.findMany({
-            where: {
-                id: jobId,
-            },
-            orderBy: {
-                score: 'desc'
-            },
-            include: {
-                User: true
-            }
-        });
-
-        if (!jobRanking) {
-            throw new NotFoundException('Job ranking not found');
-        }
-        return jobRanking;
-    }
+    return jobRanking;
+  }
 }

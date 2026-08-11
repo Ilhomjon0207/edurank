@@ -1,58 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
-
 
 @Injectable()
 export class AiService {
+  private readonly ollamaUrl = 'http://localhost:11434/api/generate';
 
-
-    async analyzeStudent(data:any){
-
-
-        const prompt = `
+  async analyzeStudent(data: any) {
+    const prompt = `
 Sen HR va ta'lim ekspertisan.
 
 Talaba ma'lumotlarini tahlil qil.
 
 Talaba:
-${JSON.stringify(data,null,2)}
+${JSON.stringify(data, null, 2)}
 
+Faqat berilgan ma'lumotlardan foydalan.
+Ma'lumot mavjud bo'lmasa, o'zingdan fakt o'ylab topma.
 
-Javobni JSON formatda ber:
+Javobni FAQAT JSON formatda ber.
+Markdown, izoh yoki boshqa text yozma.
+
+Format:
 
 {
- "strengths": [],
- "weaknesses": [],
- "recommendedJobs": [],
- "developmentPlan": []
+  "strengths": [],
+  "weaknesses": [],
+  "recommendedJobs": [],
+  "developmentPlan": []
 }
-
 `;
 
+    const response = await axios.post(this.ollamaUrl, {
+      model: 'qwen2.5:7b',
+      prompt,
+      stream: false,
+      format: 'json',
+      options: {
+        temperature: 0,
+      },
+    });
 
+    let result = response.data.response;
 
-        const response =
-            await axios.post(
-                'http://localhost:11434/api/generate',
-                {
-                    model:"qwen2.5:7b",
-                    prompt,
-                    stream:false
-                }
-            );
+    result = result
+      .replace(/```json/g, '')
+      .replace(/```/g, '')
+      .trim();
 
-
-        const result = response.data.response;
-
-        console.log(result);
-
-        return result;
-
+    try {
+      return JSON.parse(result);
+    } catch {
+      throw new InternalServerErrorException('AI returned invalid JSON');
     }
+  }
 
-    async analyzeCandidates(data:any){
-        const prompt = `
-
+  async analyzeCandidates(data: any) {
+    const prompt = `
 You are an HR analytics assistant.
 
 Analyze ONLY the provided numerical data.
@@ -67,49 +70,41 @@ Rules:
 
 Candidate data:
 
-${JSON.stringify(data,null,2)}
+${JSON.stringify(data, null, 2)}
 
 JSON format:
 
 {
- "bestCandidate":"",
- "reason":"",
- "strengths":[],
- "risks":[],
- "recommendation":""
+  "bestCandidate": "",
+  "reason": "",
+  "strengths": [],
+  "risks": [],
+  "recommendation": ""
 }
-
 `;
 
-        const start = Date.now();
-        const response =
-            await axios.post(
+    const response = await axios.post(this.ollamaUrl, {
+      model: 'qwen2.5:3b',
+      prompt,
+      stream: false,
+      format: 'json',
+      options: {
+        temperature: 0,
+        num_predict: 200,
+      },
+    });
 
-                'http://localhost:11434/api/generate',
+    let result = response.data.response;
 
-                {
-                    model: 'qwen2.5:3b',
-                    prompt,
-                    stream: false,
-                    options: {
-                        temperature: 0,
-                        num_predict: 200,
-                    },
-                }
+    result = result
+      .replace(/```json/g, '')
+      .replace(/```/g, '')
+      .trim();
 
-            );
-
-        let result = response.data.response;
-
-
-        result = result
-            .replace(/```json/g, '')
-            .replace(/```/g, '')
-            .trim();
-
-
-        return JSON.parse(result);
-
+    try {
+      return JSON.parse(result);
+    } catch {
+      throw new InternalServerErrorException('AI returned invalid JSON');
     }
-
+  }
 }

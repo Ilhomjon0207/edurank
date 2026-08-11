@@ -1,7 +1,14 @@
-import {Routes} from "@angular/router";
+import { Routes } from '@angular/router';
 
-export const routes: Routes = [
+const routes: Routes = [
     {
-        path:''
+        path: '',
+        loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard)
+    },
+    {
+        path: 'applications',
+        loadComponent: () => import('./applications/applications').then((m) => m.Applications)
     }
-]
+];
+
+export default routes;

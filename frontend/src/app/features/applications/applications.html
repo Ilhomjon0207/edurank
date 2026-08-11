@@ -1,0 +1,76 @@
+<p-card>
+    <div class="mb-10 mt-4 mr-10 flex !w-full justify-end">
+
+        <p-iconfield iconPosition="left">
+            <p-inputicon>
+                <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input pInputText pSize="small" type="text"
+                   (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
+        </p-iconfield>
+
+    </div>
+    <p-table
+        #dt1
+        [value]="applications()"
+        [paginator]="'true'"
+        [rows]="12"
+        [globalFilterFields]="['id','title','name','status','appliedAt']"
+    >
+        <ng-template #header>
+            <tr>
+                <th pSortableColumn="id">№
+                    <p-sortIcon field="id"/>
+                </th>
+                <th pSortableColumn="title">Job
+                    <p-sortIcon field="title"/>
+                </th>
+                <th pSortableColumn="name">User
+                    <p-sortIcon field="name"/>
+                </th>
+                <th pSortableColumn="status">status
+                    <p-sortIcon field="id"/>
+                </th>
+                <th class="w-36" pSortableColumn="appliedAt">AppliedAt
+                    <p-sortIcon field="appliedAt"/>
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-application>
+            <tr>
+                <td>
+                    {{ application.id }}
+                </td>
+                <td>
+                    {{ application.jobTitle }}
+                </td>
+                <td>
+                    {{ application.userName }}
+                </td>
+                    <td>
+                    <p-tag  [severity]="getStatusLabel(application.status).severity" > {{getStatusLabel(application.status).label}}</p-tag>
+                </td>
+                <td>
+                    {{ application.appliedAt | date:'dd-mm-yyyy' }}
+                </td>
+                <td>
+                    <p-button variant="outlined" [pTooltip]="'View application'"   ><i class="pi pi-eye"></i></p-button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template #emptymessage >
+            <tr>
+                <td colspan="6">
+                 <p class="text-center">   Data not found</p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
+
+

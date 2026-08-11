@@ -7,30 +7,32 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  name        String
-  email       String        @unique
-  password    String
-  role        Role          @default(STUDENT)
-  createdAt   DateTime      @default(now())
-  Application Application[]
-  refreshToken String? @map("refresh_token")
-  Log         Log[]
-  AiRecommendations AiRecommendation[]
-  Profile     Profile?
-  Ranking     Ranking[]
-  Task        Task[]
-  UserSkill   UserSkill[]
+  id                 String              @id @default(uuid())
+  name               String
+  email              String              @unique
+  password           String
+  role               Role                @default(STUDENT)
+  createdAt          DateTime            @default(now())
+  refreshToken       String?             @map("refresh_token")
+
+  Application        Application[]
+  Log                Log[]
+  AiRecommendations  AiRecommendation[]
+  Profile            Profile?
+  Ranking            Ranking[]
+  Task               Task[]
+  UserSkill          UserSkill[]
 }
 
 model Application {
-  id        Int               @id @default(autoincrement())
-  userId    Int
-  jobId     Int
+  id        String            @id @default(uuid())
+  userId    String
+  jobId     String
   status    ApplicationStatus @default(PENDING)
   appliedAt DateTime          @default(now())
-  Job       Job               @relation(fields: [jobId], references: [id])
-  User      User              @relation(fields: [userId], references: [id])
+
+  Job       Job  @relation(fields: [jobId], references: [id])
+  User      User @relation(fields: [userId], references: [id])
 
   @@unique([userId, jobId])
   @@index([jobId])
@@ -38,7 +40,7 @@ model Application {
 }
 
 model Criterion {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   weight      Float
@@ -47,26 +49,27 @@ model Criterion {
 }
 
 model Job {
-  id            Int           @id @default(autoincrement())
-  title         String
-  description   String?
-  minGpa        Float?
-  deadline      DateTime?
-  minExperience Int?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String              @id @default(uuid())
+  title             String
+  description       String?
+  minGpa            Float?
+  deadline          DateTime?
+  minExperience     Int?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
-  Application   Application[]
+  Application       Application[]
   AiRecommendations AiRecommendation[]
-  JobSkill      JobSkill[]
-  Ranking       Ranking[]
+  JobSkill          JobSkill[]
+  Ranking           Ranking[]
 }
 
 model JobSkill {
-  id            Int   @id @default(autoincrement())
-  jobId         Int
-  skillId       Int
+  id            String @id @default(uuid())
+  jobId         String
+  skillId       String
   requiredLevel Int
+
   Job           Job   @relation(fields: [jobId], references: [id])
   Skill         Skill @relation(fields: [skillId], references: [id])
 
@@ -74,27 +77,29 @@ model JobSkill {
 }
 
 model Log {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(uuid())
+  userId    String
   action    String
   createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id])
+
+  User      User @relation(fields: [userId], references: [id])
 }
 
 model Profile {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @unique
+  id               String   @id @default(uuid())
+  userId           String   @unique
   gpa              Float?
   experienceMonths Int?
   bio              String?
   createdAt        DateTime @default(now())
-  User             User     @relation(fields: [userId], references: [id])
+
+  User             User @relation(fields: [userId], references: [id])
 }
 
 model Ranking {
-  id           Int      @id @default(autoincrement())
-  jobId        Int
-  studentId    Int
+  id           String   @id @default(uuid())
+  jobId        String
+  studentId    String
   score        Float
   rank         Int?
   calculatedAt DateTime @default(now())
@@ -106,36 +111,53 @@ model Ranking {
   @@index([jobId])
   @@index([studentId])
 }
+
 model Skill {
-  id          Int         @id @default(autoincrement())
+  id          String      @id @default(uuid())
   name        String      @unique
   description String?
+
   JobSkill    JobSkill[]
   UserSkill   UserSkill[]
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
+  id          String   @id @default(uuid())
   title       String
   description String?
-  studentId   Int?
+  studentId   String?
   score       Float?
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  User        User?     @relation(fields: [studentId], references: [id])
+  createdAt   DateTime @default(now())
+
+  User        User? @relation(fields: [studentId], references: [id])
 }
 
 model UserSkill {
-  id      Int   @id @default(autoincrement())
-  userId  Int
-  skillId Int
+  id      String @id @default(uuid())
+  userId  String
+  skillId String
   level   Int
+
   User    User  @relation(fields: [userId], references: [id])
   Skill   Skill @relation(fields: [skillId], references: [id])
 
   @@unique([userId, skillId])
   @@index([userId])
   @@index([skillId])
+}
+
+model AiRecommendation {
+  id             String   @id @default(uuid())
+  jobId          String
+  candidateId    String
+  recommendation Json
+  createdAt      DateTime @default(now())
+
+  Job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  Candidate User @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, candidateId])
 }
 
 enum ApplicationStatus {
@@ -155,16 +177,4 @@ enum CriterionType {
   SKILL
   EXPERIENCE
   JOB_MATCH
-}
-model AiRecommendation {
-  id             Int      @id @default(autoincrement())
-  jobId          Int
-  candidateId    Int
-  recommendation Json
-  createdAt      DateTime @default(now())
-
-  Job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  Candidate User @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-
-  @@unique([jobId, candidateId])
 }

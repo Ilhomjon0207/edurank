@@ -13,16 +13,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const accessToken = auth.getAccessToken();
     const refreshToken = auth.getRefreshToken();
 
-    console.log('ACCESS TOKEN:', accessToken);
-    console.log('REFRESH TOKEN:', refreshToken);
 
     if (!accessToken && !refreshToken) {
         return next(req);
     }
 
     if (accessToken && !auth.isAccessTokenExpired()) {
-        console.log('USING ACCESS TOKEN');
-
         return next(
             req.clone({
                 setHeaders: {
@@ -33,11 +29,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }
 
     if (refreshToken) {
-        console.log('REFRESHING TOKEN');
 
         return auth.refreshToken().pipe(
             switchMap((res) => {
-                console.log('REFRESH RESPONSE:', res);
 
                 auth.saveTokens(res);
 

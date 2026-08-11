@@ -31,8 +31,8 @@ export class DashboardService extends BaseCrudService<IDashboard, any, any> {
             map((data: IRecentApplication[]) =>
                 data.map((data, index) => ({
                     id: index,
-                    student: data.User.name,
-                    jobName: data.Job.title,
+                    student: data.userName,
+                    jobName: data.jobTitle,
                     status: data.status
                 }))
             )

@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 
-import {MenuItem} from "primeng/api";
-import {Menuitem} from "@/app/layout/menuitem/menuitem";
+import { MenuItem } from 'primeng/api';
+import { Menuitem } from '@/app/layout/menuitem/menuitem';
 
 @Component({
-  selector: 'app-menu',
-    imports: [
-        Menuitem
-    ],
-  templateUrl: './menu.html',
-  styleUrl: './menu.scss',
+    selector: 'app-menu',
+    imports: [Menuitem],
+    templateUrl: './menu.html',
+    styleUrl: './menu.scss'
 })
 export class Menu {
     model: MenuItem[] = [];
@@ -18,7 +16,10 @@ export class Menu {
         this.model = [
             {
                 label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
+                items: [
+                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
+                    { label: 'Applications', icon: 'pi pi-fw pi-file', routerLink: ['/applications'] }
+                ]
             },
             {
                 label: 'UI Components',

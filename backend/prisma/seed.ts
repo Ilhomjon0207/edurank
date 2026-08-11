@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
@@ -20,8 +21,11 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({
   adapter,
 });
+
 async function main() {
+  // ======================
   // CLEAR DATABASE
+  // ======================
 
   await prisma.log.deleteMany();
   await prisma.ranking.deleteMany();
@@ -29,6 +33,7 @@ async function main() {
   await prisma.application.deleteMany();
   await prisma.jobSkill.deleteMany();
   await prisma.userSkill.deleteMany();
+  await prisma.aiRecommendation.deleteMany();
   await prisma.job.deleteMany();
   await prisma.skill.deleteMany();
   await prisma.profile.deleteMany();
@@ -107,6 +112,7 @@ async function main() {
     });
 
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
     const student = await prisma.user.create({
       data: {
         name: faker.person.fullName(),
@@ -140,7 +146,7 @@ async function main() {
   }
 
   // ======================
-  // USER SKILL
+  // USER SKILLS
   // ======================
 
   for (const student of students) {
@@ -150,7 +156,6 @@ async function main() {
       await prisma.userSkill.create({
         data: {
           userId: student.id,
-
           skillId: skill.id,
 
           level: faker.number.int({
@@ -163,7 +168,7 @@ async function main() {
   }
 
   // ======================
-  // JOB
+  // JOBS
   // ======================
 
   const jobs: Job[] = [];
@@ -192,7 +197,7 @@ async function main() {
   }
 
   // ======================
-  // JOB SKILL
+  // JOB SKILLS
   // ======================
 
   for (const job of jobs) {
@@ -202,7 +207,6 @@ async function main() {
       await prisma.jobSkill.create({
         data: {
           jobId: job.id,
-
           skillId: skill.id,
 
           requiredLevel: faker.number.int({
@@ -215,14 +219,13 @@ async function main() {
   }
 
   // ======================
-  // APPLICATION
+  // APPLICATIONS
   // ======================
 
   const applicationPairs = new Set<string>();
 
   while (applicationPairs.size < 200) {
     const student = faker.helpers.arrayElement(students);
-
     const job = faker.helpers.arrayElement(jobs);
 
     const key = `${student.id}-${job.id}`;
@@ -236,7 +239,6 @@ async function main() {
     await prisma.application.create({
       data: {
         userId: student.id,
-
         jobId: job.id,
 
         status: faker.helpers.arrayElement([
@@ -249,10 +251,12 @@ async function main() {
   }
 
   // ======================
-  // RANKING
+  // RANKINGS
   // ======================
 
-  for (const application of await prisma.application.findMany()) {
+  const applications = await prisma.application.findMany();
+
+  for (const application of applications) {
     await prisma.ranking.create({
       data: {
         jobId: application.jobId,
@@ -270,7 +274,7 @@ async function main() {
   }
 
   // ======================
-  // TASK
+  // TASKS
   // ======================
 
   for (let i = 0; i < 100; i++) {
@@ -292,28 +296,27 @@ async function main() {
   }
 
   // ======================
-  // LOG
+  // LOGS
   // ======================
 
   for (const student of students) {
     await prisma.log.create({
       data: {
         userId: student.id,
-
         action: 'Seed created user',
       },
     });
   }
 
-  console.log('Seed completed ✅');
+  console.log('Seed completed successfully');
 }
 
 main()
   .catch((error) => {
     console.error(error);
-
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

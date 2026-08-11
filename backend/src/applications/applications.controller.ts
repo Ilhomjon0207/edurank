@@ -6,7 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards, Query,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -48,7 +49,7 @@ export class ApplicationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.applicationsService.findOne(+id);
+    return this.applicationsService.findOne(id);
   }
 
   @Patch(':id')
@@ -57,11 +58,11 @@ export class ApplicationsController {
     @Param('id') id: string,
     @Body() updateApplicationDto: UpdateApplicationDto,
   ) {
-    return this.applicationsService.update(+id, updateApplicationDto);
+    return this.applicationsService.update(id, updateApplicationDto);
   }
 
   @Delete(':id')
   remove(@CurrentUser() user, @Param('id') id: string) {
-    return this.applicationsService.remove(+id, user.id);
+    return this.applicationsService.remove(id, user.id);
   }
 }

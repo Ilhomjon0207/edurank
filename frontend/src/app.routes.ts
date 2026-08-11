@@ -11,7 +11,7 @@ export const appRoutes: Routes = [
         path: '',
         component: MainLayout,
         children: [
-            { path: '', component: Dashboard },
+            { path: '', loadChildren: ()=>import('./app/features/features.routes') },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }

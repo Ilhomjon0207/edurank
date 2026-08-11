@@ -1,20 +1,24 @@
-import {IUser}   from './user.interface'
-import {IJob}   from './job.interface'
-import  {ApplicationStatus} from '../enums'
+import { ApplicationStatus } from '../enums';
+
 export interface IRecentApplication {
     id: number;
     userId: number;
     jobId: number;
     status: ApplicationStatus;
     appliedAt: string;
-    User: IUser;
-    Job: IJob;
+    userEmail: string;
+    userName: string;
+    jobTitle: string;
 }
 
 export interface IRecentApplicationResponse {
     id: number;
     status: ApplicationStatus;
-    student:string;
+    student: string;
     jobName: string;
-
 }
+
+export interface IApplicationUpdate {}
+
+export type IApplication = Omit<IRecentApplication, 'jobId' | 'userId'>;
+export interface IApplicationRequest {}

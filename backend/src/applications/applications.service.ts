@@ -12,7 +12,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ApplicationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(userId: number, dto: CreateApplicationDto) {
+  async create(userId: string, dto: CreateApplicationDto) {
     const job = await this.prisma.job.findUnique({
       where: {
         id: dto.jobId,
@@ -51,14 +51,57 @@ export class ApplicationsService {
     });
   }
 
-  findAll() {
-    return this.prisma.application.findMany();
+  async findAll() {
+    const applications = await this.prisma.application.findMany({
+      select: {
+        id: true,
+        appliedAt: true,
+        status: true,
+        Job: {
+          select: {
+            title: true,
+            id: true,
+          },
+        },
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return applications.map((application) => ({
+      id: application.id,
+      userId: application.User.id,
+      userName: application.User.name,
+      userEmail: application.User.email,
+      jobId: application.Job.id,
+      jobTitle: application.Job.title,
+      status: application.status,
+      appliedAt: application.appliedAt,
+    }));
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const application = await this.prisma.application.findUnique({
       where: {
         id: id,
+      },
+      select: {
+        id: true,
+        appliedAt: true,
+        status: true,
+        Job: true,
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
     if (!application) {
@@ -68,7 +111,7 @@ export class ApplicationsService {
     return application;
   }
 
-  async update(id: number, updateApplicationDto: UpdateApplicationDto) {
+  async update(id: string, updateApplicationDto: UpdateApplicationDto) {
     const application = await this.prisma.application.findUnique({
       where: {
         id: id,
@@ -88,7 +131,7 @@ export class ApplicationsService {
     });
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: string, userId: string) {
     const application = await this.prisma.application.findFirst({
       where: {
         id: id,
@@ -106,7 +149,7 @@ export class ApplicationsService {
     });
   }
 
-  findMyApplications(userId: number) {
+  findMyApplications(userId: string) {
     return this.prisma.application.findMany({
       where: {
         userId,

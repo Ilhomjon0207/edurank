@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class RankingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async calculate(jobId: number, studentId: number) {
+  async calculate(jobId: string, studentId: string) {
     const student = await this.prisma.user.findUnique({
       where: {
         id: studentId,
@@ -244,7 +244,7 @@ export class RankingService {
     }));
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const rank = await this.prisma.ranking.findUnique({
       where: {
         id,
@@ -257,7 +257,7 @@ export class RankingService {
     return rank;
   }
 
-  async findTop(jobId: number, limit: number = 10) {
+  async findTop(jobId: string, limit: number = 10) {
     const rankings = await this.prisma.ranking.findMany({
       where: {
         jobId,
@@ -295,7 +295,7 @@ export class RankingService {
       },
     }));
   }
-  async findMyRanking(userId: number) {
+  async findMyRanking(userId: string) {
     const ranking = await this.prisma.ranking.findUnique({
       where: {
         id: userId,

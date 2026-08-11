@@ -4,23 +4,27 @@ CREATE TYPE "ApplicationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
 
+-- CreateEnum
+CREATE TYPE "CriterionType" AS ENUM ('GPA', 'SKILL', 'EXPERIENCE', 'JOB_MATCH');
+
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'STUDENT',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "refresh_token" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Application" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "jobId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "jobId" TEXT NOT NULL,
     "status" "ApplicationStatus" NOT NULL DEFAULT 'PENDING',
     "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -29,7 +33,7 @@ CREATE TABLE "Application" (
 
 -- CreateTable
 CREATE TABLE "Criterion" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "weight" DOUBLE PRECISION NOT NULL,
@@ -41,7 +45,7 @@ CREATE TABLE "Criterion" (
 
 -- CreateTable
 CREATE TABLE "Job" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
     "minGpa" DOUBLE PRECISION,
@@ -55,9 +59,9 @@ CREATE TABLE "Job" (
 
 -- CreateTable
 CREATE TABLE "JobSkill" (
-    "id" SERIAL NOT NULL,
-    "jobId" INTEGER NOT NULL,
-    "skillId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "skillId" TEXT NOT NULL,
     "requiredLevel" INTEGER NOT NULL,
 
     CONSTRAINT "JobSkill_pkey" PRIMARY KEY ("id")
@@ -65,8 +69,8 @@ CREATE TABLE "JobSkill" (
 
 -- CreateTable
 CREATE TABLE "Log" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "action" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -75,8 +79,8 @@ CREATE TABLE "Log" (
 
 -- CreateTable
 CREATE TABLE "Profile" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "gpa" DOUBLE PRECISION,
     "experienceMonths" INTEGER,
     "bio" TEXT,
@@ -87,8 +91,9 @@ CREATE TABLE "Profile" (
 
 -- CreateTable
 CREATE TABLE "Ranking" (
-    "id" SERIAL NOT NULL,
-    "studentId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
     "score" DOUBLE PRECISION NOT NULL,
     "rank" INTEGER,
     "calculatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -98,7 +103,7 @@ CREATE TABLE "Ranking" (
 
 -- CreateTable
 CREATE TABLE "Skill" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
 
@@ -107,10 +112,10 @@ CREATE TABLE "Skill" (
 
 -- CreateTable
 CREATE TABLE "Task" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "studentId" INTEGER,
+    "studentId" TEXT,
     "score" DOUBLE PRECISION,
     "dueDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -120,12 +125,23 @@ CREATE TABLE "Task" (
 
 -- CreateTable
 CREATE TABLE "UserSkill" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "skillId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "skillId" TEXT NOT NULL,
     "level" INTEGER NOT NULL,
 
     CONSTRAINT "UserSkill_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AiRecommendation" (
+    "id" TEXT NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "candidateId" TEXT NOT NULL,
+    "recommendation" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AiRecommendation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -150,7 +166,13 @@ CREATE UNIQUE INDEX "JobSkill_jobId_skillId_key" ON "JobSkill"("jobId", "skillId
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
 
 -- CreateIndex
+CREATE INDEX "Ranking_jobId_idx" ON "Ranking"("jobId");
+
+-- CreateIndex
 CREATE INDEX "Ranking_studentId_idx" ON "Ranking"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Ranking_jobId_studentId_key" ON "Ranking"("jobId", "studentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Skill_name_key" ON "Skill"("name");
@@ -163,6 +185,9 @@ CREATE INDEX "UserSkill_skillId_idx" ON "UserSkill"("skillId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserSkill_userId_skillId_key" ON "UserSkill"("userId", "skillId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AiRecommendation_jobId_candidateId_key" ON "AiRecommendation"("jobId", "candidateId");
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -183,7 +208,10 @@ ALTER TABLE "Log" ADD CONSTRAINT "Log_userId_fkey" FOREIGN KEY ("userId") REFERE
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Ranking" ADD CONSTRAINT "Ranking_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Ranking" ADD CONSTRAINT "Ranking_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Ranking" ADD CONSTRAINT "Ranking_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Task" ADD CONSTRAINT "Task_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -193,3 +221,9 @@ ALTER TABLE "UserSkill" ADD CONSTRAINT "UserSkill_userId_fkey" FOREIGN KEY ("use
 
 -- AddForeignKey
 ALTER TABLE "UserSkill" ADD CONSTRAINT "UserSkill_skillId_fkey" FOREIGN KEY ("skillId") REFERENCES "Skill"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AiRecommendation" ADD CONSTRAINT "AiRecommendation_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AiRecommendation" ADD CONSTRAINT "AiRecommendation_candidateId_fkey" FOREIGN KEY ("candidateId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
