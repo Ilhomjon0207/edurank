@@ -161,15 +161,32 @@ export class ApplicationsService {
   }
 
   async getRecentApplication(limit: number = 5) {
-    return this.prisma.application.findMany({
+    const recentApplications = await this.prisma.application.findMany({
       take: limit,
       orderBy: {
         appliedAt: 'desc',
       },
       include: {
-        User: true,
-        Job: true,
+        User: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        Job: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
+
+    return recentApplications.map((recentApplication) => ({
+      id: recentApplication.id,
+      userId: recentApplication.User.id,
+      userName: recentApplication.User.name,
+      jobTitle: recentApplication.Job.title,
+      status: recentApplication.status,
+    }));
   }
 }

@@ -259,9 +259,6 @@ export class RankingService {
 
   async findTop(jobId: string, limit: number = 10) {
     const rankings = await this.prisma.ranking.findMany({
-      where: {
-        jobId,
-      },
       take: limit,
       orderBy: {
         rank: 'asc',
