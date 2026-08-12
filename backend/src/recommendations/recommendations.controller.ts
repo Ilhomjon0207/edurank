@@ -1,25 +1,20 @@
-import {Controller, Get, Param, ParseIntPipe} from '@nestjs/common';
-import {ApiBearerAuth} from "@nestjs/swagger";
-import {RecommendationsService} from "./recommendations.service";
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { RecommendationsService } from './recommendations.service';
 
-@ApiBearerAuth("JWT")
+@ApiBearerAuth('JWT')
 @Controller('recommendations')
 export class RecommendationsController {
+  constructor(
+    private readonly recommendationsService: RecommendationsService,
+  ) {}
 
-    constructor(private readonly recommendationsService: RecommendationsService) {
-    }
-
-    @Get('student/:id')
-    getStudentRecommendation(@Param('id', ParseIntPipe) id: number) {
-
-        return this.recommendationsService.getStudentRecommendations(id)
-    }
-    @Get('student/:id/ai')
-    async aiRecommendation(
-        @Param('id', ParseIntPipe) id:number
-    ){
-
-        return this.recommendationsService.aiRecommendation(id);
-
-    }
+  @Get('student/:id')
+  getStudentRecommendation(@Param('id') id:string ) {
+    return this.recommendationsService.getStudentRecommendations(id);
+  }
+  @Get('student/:id/ai')
+  async aiRecommendation(@Param('id') id: string) {
+    return this.recommendationsService.aiRecommendation(id);
+  }
 }

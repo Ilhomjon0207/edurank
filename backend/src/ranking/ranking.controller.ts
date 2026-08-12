@@ -24,7 +24,7 @@ export class RankingController {
   }
   @Post('calculate/:jobId')
   calculate(
-    @Param('jobId', ParseIntPipe) jobId: number,
+    @Param('jobId', ParseIntPipe) jobId: string,
     @CurrentUser() user: JwtPayload.IJwtPayload,
   ) {
     return this.rankingService.calculate(jobId, user.sub);
@@ -38,7 +38,7 @@ export class RankingController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
     limit: number,
   ) {
-    return this.rankingService.findTop(limit);
+    return this.rankingService.findTop(String(limit));
   }
   @Get('me')
   myRanking(@CurrentUser() user: JwtPayload_2.IJwtPayload) {
@@ -47,7 +47,7 @@ export class RankingController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.rankingService.findOne(+id);
+    return this.rankingService.findOne(id);
   }
 
   // @Patch(':id')
