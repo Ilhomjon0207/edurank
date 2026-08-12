@@ -15,6 +15,7 @@ export class RecommendationsController {
   }
   @Get('student/:id/ai')
   async aiRecommendation(@Param('id') id: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.recommendationsService.aiRecommendation(id);
   }
 }
