@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
-import { IApplication } from '@/app/core/interfaces';
+import { IApplication, IApplicationDetail } from '@/app/core/interfaces';
 import { ApplicationsService } from '@/app/features/applications/applications.service';
 import { Card } from 'primeng/card';
-import { Table, TableModule } from 'primeng/table';
+import { TableModule } from 'primeng/table';
 import { DatePipe } from '@angular/common';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -13,18 +13,22 @@ import { Tag } from 'primeng/tag';
 import { Severety } from '@/app/core/types';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
 
 @Component({
     selector: 'app-applications',
-    imports: [Card, TableModule, DatePipe, IconFieldModule, InputIconModule, InputTextModule, FormsModule, Tag, Button, Tooltip],
+    imports: [Card, TableModule, DatePipe, IconFieldModule, InputIconModule, InputTextModule, FormsModule, Tag, Button, Tooltip, Dialog],
     templateUrl: './applications.html',
+    standalone: true,
     styleUrl: './applications.scss'
 })
 export class Applications implements OnInit {
     applications = signal<IApplication[]>([]);
 
+    detailApplication = signal<IApplicationDetail>({} as IApplicationDetail);
     private service = inject(ApplicationsService);
 
+    visibleDetails = signal(false);
     loadApplications() {
         this.service.getApplications().subscribe({
             next: (data) => {
@@ -63,6 +67,22 @@ export class Applications implements OnInit {
         }
     }
 
+    openDetails(id: string) {
+        this.visibleDetails.set(true);
+        this.service.getApplicationById(id).subscribe({
+            next: (data) => {
+                this.detailApplication.set(data);
+                console.log(this.detailApplication());
+            },
+            error: (error) => {
+                console.error('Error fetching application details:', error);
+            }
+        });
+    }
+    closeDetails() {
+        this.visibleDetails.set(false);
+        this.detailApplication.set({} as IApplicationDetail);
+    }
     ngOnInit(): void {
         this.loadApplications();
     }

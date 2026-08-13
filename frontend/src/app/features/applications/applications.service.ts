@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseCrudService } from '@/app/core/services/base-crud.service';
-import { IApplication, IApplicationRequest, IApplicationUpdate } from '@/app/core/interfaces';
+import { IApplication, IApplicationDetail, IApplicationRequest, IApplicationUpdate } from '@/app/core/interfaces';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -13,5 +13,9 @@ export class ApplicationsService extends BaseCrudService<IApplication, IApplicat
 
      getApplications(): Observable<IApplication[]> {
         return this.getAll();
+    }
+
+    getApplicationById(id:string):Observable<IApplicationDetail>{
+        return this.http.get<IApplicationDetail>(`${this.apiUrl}${this.endpoint}/${id}`);
     }
 }

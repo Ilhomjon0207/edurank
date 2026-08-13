@@ -1,76 +1,218 @@
 <p-card>
     <div class="mb-10 mt-4 mr-10 flex !w-full justify-end">
-
         <p-iconfield iconPosition="left">
             <p-inputicon>
                 <i class="pi pi-search"></i>
             </p-inputicon>
-            <input pInputText pSize="small" type="text"
-                   (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
+            <input pInputText pSize="small" type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search" />
         </p-iconfield>
-
     </div>
-    <p-table
-        #dt1
-        [value]="applications()"
-        [paginator]="'true'"
-        [rows]="12"
-        [globalFilterFields]="['id','title','name','status','appliedAt']"
-    >
+    <p-table #dt1 [value]="applications()" [paginator]="'true'" [rows]="12" [globalFilterFields]="['id','jobTitle','name','status','appliedAt']">
         <ng-template #header>
             <tr>
-                <th pSortableColumn="id">№
-                    <p-sortIcon field="id"/>
+                <th pSortableColumn="id">
+                    №
+                    <p-sortIcon field="id" />
                 </th>
-                <th pSortableColumn="title">Job
-                    <p-sortIcon field="title"/>
+                <th pSortableColumn="jobTitle">
+                    Job
+                    <p-sortIcon field="jobTitle" />
                 </th>
-                <th pSortableColumn="name">User
-                    <p-sortIcon field="name"/>
+                <th pSortableColumn="userName">
+                    User
+                    <p-sortIcon field="userName" />
                 </th>
-                <th pSortableColumn="status">status
-                    <p-sortIcon field="id"/>
+                <th pSortableColumn="status">
+                    status
+                    <p-sortIcon field="id" />
                 </th>
-                <th class="w-36" pSortableColumn="appliedAt">AppliedAt
-                    <p-sortIcon field="appliedAt"/>
+                <th class="w-36" pSortableColumn="appliedAt">
+                    AppliedAt
+                    <p-sortIcon field="appliedAt" />
                 </th>
-                <th>
-                    Actions
-                </th>
+                <th>Actions</th>
             </tr>
         </ng-template>
 
-        <ng-template #body let-application>
+        <ng-template #body let-application let-rowIndex="rowIndex">
             <tr>
+                <td>{{ rowIndex+1 }}</td>
+                <td>{{ application.jobTitle }}</td>
+                <td>{{ application.userName }}</td>
                 <td>
-                    {{ application.id }}
+                    <p-tag [severity]="getStatusLabel(application.status).severity"> {{getStatusLabel(application.status).label}}</p-tag>
                 </td>
+                <td>{{ application.appliedAt | date:'dd-mm-yyyy' }}</td>
                 <td>
-                    {{ application.jobTitle }}
-                </td>
-                <td>
-                    {{ application.userName }}
-                </td>
-                    <td>
-                    <p-tag  [severity]="getStatusLabel(application.status).severity" > {{getStatusLabel(application.status).label}}</p-tag>
-                </td>
-                <td>
-                    {{ application.appliedAt | date:'dd-mm-yyyy' }}
-                </td>
-                <td>
-                    <p-button variant="outlined" [pTooltip]="'View application'"   ><i class="pi pi-eye"></i></p-button>
+                    <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'"><i class="pi pi-eye"></i></p-button>
                 </td>
             </tr>
         </ng-template>
 
-        <ng-template #emptymessage >
+        <ng-template #emptymessage>
             <tr>
                 <td colspan="6">
-                 <p class="text-center">   Data not found</p>
+                    <p class="text-center">Data not found</p>
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </p-card>
+<p-dialog
+    [(visible)]="visibleDetails"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '650px' }"
+    header="Application Details"
+>
+    <div class="flex flex-col gap-6">
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Job Information
+            </h4>
 
+            <div class="rounded-lg border border-gray-200 p-4">
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Position
+                    </span>
 
+                    <p class="mt-1 text-lg font-semibold">
+                        {{ detailApplication().job?.title || '—' }}
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Description
+                    </span>
+
+                    <p class="mt-1 text-sm text-gray-700">
+                        {{ detailApplication().job?.description || 'No description' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Minimum GPA
+                        </span>
+
+                        <p class="mt-1 font-medium">
+                            {{ detailApplication().job?.minGpa ?? '—' }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Minimum Experience
+                        </span>
+
+                        <p class="mt-1 font-medium">
+                            {{ detailApplication().job?.minExperience ?? 0 }} months
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Applicant
+            </h4>
+
+            <div class="rounded-lg border border-gray-200 p-4">
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Name
+                    </span>
+
+                    <p class="mt-1 font-semibold">
+                        {{ detailApplication().student?.name || '—' }}
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">
+                        Email
+                    </span>
+
+                    <p class="mt-1">
+                        {{ detailApplication().student?.email || '—' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            GPA
+                        </span>
+
+                        <p class="mt-1 font-semibold">
+                            {{ detailApplication().student?.profile?.gpa ?? '—' }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm text-gray-500">
+                            Experience
+                        </span>
+
+                        <p class="mt-1 font-semibold">
+                            {{ detailApplication().student?.profile?.experienceMonths ?? 0 }}
+                            months
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div>
+            <h4 class="mb-3 text-lg font-semibold">
+                Skills
+            </h4>
+
+            <div class="flex flex-wrap gap-2">
+                @for (skill of detailApplication().student?.skills ?? []; track skill.id) {
+                    <p-tag
+                        [value]="skill.name + ' · ' + skill.level"
+                        severity="info"
+                    />
+                }
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+            <div>
+                <span class="text-sm text-gray-500">
+                    Application Status
+                </span>
+
+                <p class="mt-1 text-sm">
+                    Submitted on
+                    {{ detailApplication().appliedAt | date:'dd.MM.yyyy HH:mm' }}
+                </p>
+            </div>
+
+            <p-tag
+                [value]="getStatusLabel(detailApplication().status)?.label || 'Unknown'"
+                [severity]="getStatusLabel(detailApplication().status)?.severity"
+            />
+        </div>
+
+    </div>
+
+    <ng-template #footer>
+        <p-button
+            label="Close"
+            severity="secondary"
+            [outlined]="true"
+            (click)="closeDetails()"
+        />
+    </ng-template>
+</p-dialog>

@@ -87,28 +87,70 @@ export class ApplicationsService {
 
   async findOne(id: string) {
     const application = await this.prisma.application.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        id: true,
-        appliedAt: true,
-        status: true,
-        Job: true,
+      where: { id },
+
+      include: {
         User: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+          include: {
+            Profile: true,
+            UserSkill: {
+              include: {
+                Skill: true,
+              },
+            },
+          },
+        },
+
+        Job: {
+          include: {
+            JobSkill: {
+              include: {
+                Skill: true,
+              },
+            },
           },
         },
       },
     });
+
     if (!application) {
       throw new NotFoundException(`Application with ID ${id} not found`);
     }
 
-    return application;
+    return {
+      id: application.id,
+      status: application.status,
+      appliedAt: application.appliedAt,
+
+      student: {
+        id: application.User.id,
+        name: application.User.name,
+        email: application.User.email,
+
+        profile: application.User.Profile,
+
+        skills: application.User.UserSkill.map((item) => ({
+          id: item.Skill.id,
+          name: item.Skill.name,
+          level: item.level,
+        })),
+      },
+
+      job: {
+        id: application.Job.id,
+        title: application.Job.title,
+        description: application.Job.description,
+        minGpa: application.Job.minGpa,
+        minExperience: application.Job.minExperience,
+        deadline: application.Job.deadline,
+
+        skills: application.Job.JobSkill.map((item) => ({
+          id: item.Skill.id,
+          name: item.Skill.name,
+          requiredLevel: item.requiredLevel,
+        })),
+      },
+    };
   }
 
   async update(id: string, updateApplicationDto: UpdateApplicationDto) {
