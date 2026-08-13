@@ -18,9 +18,9 @@ import * as JwtPayload_2 from '../common/interfaces/JwtPayload';
 export class RankingController {
   constructor(private readonly rankingService: RankingService) {}
 
-  @Post('calculate-all')
-  calculateAll() {
-    return this.rankingService.calculateAll();
+  @Post('calculate-all/:jobId')
+  calculateAll(@Param('jobId') jobId: string) {
+    return this.rankingService.calculateAll(jobId);
   }
   @Post('calculate/:jobId')
   calculate(

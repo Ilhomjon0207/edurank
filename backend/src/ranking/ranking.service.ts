@@ -142,60 +142,44 @@ export class RankingService {
     };
   }
 
-  async calculateAll() {
-    const jobs = await this.prisma.job.findMany({
+  async calculateAll(jobId: string) {
+    const students = await this.prisma.user.findMany({
+      where: {
+        role: 'STUDENT',
+      },
       select: {
         id: true,
       },
     });
 
-    let processedStudents = 0;
+    for (const student of students) {
+      await this.calculate(jobId, student.id);
+    }
 
-    for (const job of jobs) {
-      const applications = await this.prisma.application.findMany({
+    const rankings = await this.prisma.ranking.findMany({
+      where: {
+        jobId,
+      },
+      orderBy: {
+        score: 'desc',
+      },
+    });
+
+    for (let i = 0; i < rankings.length; i++) {
+      await this.prisma.ranking.update({
         where: {
-          jobId: job.id,
+          id: rankings[i].id,
         },
-        select: {
-          userId: true,
+        data: {
+          rank: i + 1,
         },
       });
-
-      for (const application of applications) {
-        await this.calculate(job.id, application.userId);
-
-        processedStudents++;
-      }
-
-      // =====================
-      // CALCULATE RANK
-      // =====================
-
-      const rankings = await this.prisma.ranking.findMany({
-        where: {
-          jobId: job.id,
-        },
-        orderBy: {
-          score: 'desc',
-        },
-      });
-
-      for (let i = 0; i < rankings.length; i++) {
-        await this.prisma.ranking.update({
-          where: {
-            id: rankings[i].id,
-          },
-          data: {
-            rank: i + 1,
-          },
-        });
-      }
     }
 
     return {
       message: 'Ranking successfully recalculated.',
-      processedStudents,
-      processedJobs: jobs.length,
+      jobId,
+      processedStudents: students.length,
     };
   }
 
