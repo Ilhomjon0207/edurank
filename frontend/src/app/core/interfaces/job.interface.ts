@@ -1,5 +1,5 @@
 export interface IJob {
-    id: number;
+    id: string;
     title: string;
     description: string;
     minGpa: number;
@@ -8,3 +8,6 @@ export interface IJob {
     createdAt: string;
     updatedAt: string;
 }
+
+export type IJobsList = Pick<IJob, 'id' | 'title' | 'description' >;
+

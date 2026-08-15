@@ -1,0 +1,207 @@
+<p-card>
+
+<div class="flex gap-3 mb-4">
+
+    <p-select
+        [options]="jobs()"
+        optionLabel="title"
+        optionValue="id"
+        class="w-100"
+        placeholder="Select job"
+        (onChange)="onJobChange($event.value)"
+    />
+
+    <p-button
+        label="Calculate Ranking"
+        icon="pi pi-chart-bar"
+        [disabled]="!selectedJobId()"
+        [loading]="loading()"
+        (onClick)="calculate()"
+    />
+
+</div>
+    @if (selectedJob(); as job) {
+        <div
+            class="flex align-items-center gap-2 mb-8
+               surface-card border-b-1 border-primary
+           px-3 py-2"
+        >
+            <i class="pi pi-briefcase text-primary"></i>
+
+            <span class="text-500">
+            Selected job:
+        </span>
+
+            <span class="font-semibold text-900">
+            {{ job }}
+        </span>
+
+            <i class="pi pi-check-circle text-green-500 ml-1"></i>
+        </div>
+    }
+    <p-table [value]="candidates()"
+    [loading]="loading()"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th>#</th>
+                <th>Candidate</th>
+                <th>Email</th>
+                <th>GPA</th>
+                <th>Experience</th>
+                <th>Score</th>
+                <th>Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>
+                    {{ item.rank }}
+                </td>
+
+                <td>
+                    {{ item.student.name }}
+                </td>
+
+                <td>
+                    {{ item.student.email }}
+                </td>
+
+                <td>
+                    {{ item.student.gpa }}
+                </td>
+
+                <td>
+                    {{ item.student.experience }} months
+                </td>
+
+                <td>
+                    {{ item.score }}
+                </td>
+                <td>
+                    <p-button
+                        icon="pi pi-eye"
+                        [text]="true"
+                        [pTooltip]="'detail'"
+                        [tooltipPosition]="'top'"
+                        [rounded]="true"
+                        severity="secondary"
+                        (onClick)="openCandidate(item)"
+                    />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
+<p-dialog
+    header="Candidate Details"
+    [modal]="true"
+    [closable]="true"
+    [(visible)]="candidateDialogVisible"
+    [style]="{ width: '400px' }"
+>
+    @if (selectedCandidate(); as candidate) {
+
+        <!-- Candidate -->
+        <div class="flex items-center gap-3 mb-3">
+
+            <div
+                class="flex items-center justify-center
+                       border-circle bg-primary-100"
+                style="width: 3rem; height: 3rem;"
+            >
+                <i class="pi pi-user text-primary"></i>
+            </div>
+
+            <div class="flex-1">
+
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-900">
+                        {{ candidate.student.name }}
+                    </span>
+
+                    <p-tag
+                        [value]="'#' + candidate.rank"
+                        severity="info"
+                    />
+                </div>
+
+                <small class="text-500">
+                    {{ candidate.student.email }}
+                </small>
+
+            </div>
+
+        </div>
+
+        <!-- Final Score -->
+        <div
+            class="flex items-center justify-between
+                   surface-100 border border-gray-200
+                   rounded-lg px-3 py-2 mb-3"
+        >
+            <div class="flex items-center gap-2">
+                <i class="pi pi-chart-line text-primary"></i>
+
+                <span class="text-500 text-sm">
+                    Final Score
+                </span>
+            </div>
+
+            <span class="text-xl font-bold text-primary">
+                {{ candidate.score }}
+            </span>
+        </div>
+
+        <!-- Information -->
+        <div class="flex items-center gap-2">
+
+            <!-- GPA -->
+            <div class="flex-1">
+                <div
+                    class="border border-gray-200
+                           rounded-lg p-2"
+                >
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-star text-primary text-sm"></i>
+
+                        <small class="text-500">
+                            GPA
+                        </small>
+                    </div>
+
+                    <div class="font-semibold mt-1">
+                        {{ candidate.student.gpa }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience -->
+            <div class="flex-1">
+                <div
+                    class="border border-gray-200
+                           rounded-lg p-2"
+                >
+                    <div class="flex items-center gap-2">
+                        <i class="pi pi-briefcase text-primary text-sm"></i>
+
+                        <small class="text-500">
+                            Experience
+                        </small>
+                    </div>
+
+                    <div class="font-semibold mt-1">
+                        {{ candidate.student.experience }}
+                        <small class="text-500">
+                            months
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    }
+</p-dialog>
+<p-toast/>

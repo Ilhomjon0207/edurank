@@ -7,7 +7,8 @@ import { Menuitem } from '@/app/layout/menuitem/menuitem';
     selector: 'app-menu',
     imports: [Menuitem],
     templateUrl: './menu.html',
-    styleUrl: './menu.scss'
+    styleUrl: './menu.scss',
+    standalone: true,
 })
 export class Menu {
     model: MenuItem[] = [];
@@ -18,7 +19,8 @@ export class Menu {
                 label: 'Home',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
-                    { label: 'Applications', icon: 'pi pi-fw pi-file', routerLink: ['/applications'] }
+                    { label: 'Applications', icon: 'pi pi-fw pi-file', routerLink: ['/applications'] },
+                    { label: 'Ranking', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/ranking'] }
                 ]
             },
             {

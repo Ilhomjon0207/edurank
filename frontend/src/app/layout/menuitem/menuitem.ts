@@ -6,13 +6,8 @@ import {NgClass} from "@angular/common";
 import {Ripple} from "primeng/ripple";
 
 @Component({
-  selector: 'app-menuitem',
-    imports: [
-        NgClass,
-        RouterLink,
-        RouterLinkActive,
-        Ripple,
-    ],
+    selector: 'app-menuitem',
+    imports: [NgClass, RouterLink, RouterLinkActive, Ripple],
     host: {
         '[class.active-menuitem]': 'isActive()',
         '[class.layout-root-menuitem]': 'root()'
@@ -50,8 +45,9 @@ import {Ripple} from "primeng/ripple";
             }
         `
     ],
-  templateUrl: './menuitem.html',
-  styleUrl: './menuitem.scss',
+    templateUrl: './menuitem.html',
+    styleUrl: './menuitem.scss',
+    standalone: true
 })
 export class Menuitem {
     layoutService = inject(LayoutService);

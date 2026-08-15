@@ -8,6 +8,10 @@ const routes: Routes = [
     {
         path: 'applications',
         loadComponent: () => import('./applications/applications').then((m) => m.Applications)
+    },
+    {
+        path: 'ranking',
+        loadComponent: () => import('./ranking/ranking').then((m) => m.Ranking)
     }
 ];
 

@@ -127,7 +127,18 @@ export class RankingService {
         rank: null,
       },
     });
+    console.log('STUDENT:', {
+      id: student.id,
+      name: student.name,
+      profile: student.Profile,
+      skills: student.UserSkill,
+    });
 
+    console.log('JOB:', {
+      id: job.id,
+      title: job.title,
+      skills: job.JobSkill,
+    });
     return {
       student: student.name,
       job: job.title,
@@ -160,26 +171,34 @@ export class RankingService {
       where: {
         jobId,
       },
-      orderBy: {
-        score: 'desc',
-      },
+      orderBy: [
+        {
+          score: 'desc',
+        },
+        {
+          calculatedAt: 'asc',
+        },
+      ],
     });
 
-    for (let i = 0; i < rankings.length; i++) {
-      await this.prisma.ranking.update({
-        where: {
-          id: rankings[i].id,
-        },
-        data: {
-          rank: i + 1,
-        },
-      });
-    }
+    await this.prisma.$transaction(
+      rankings.map((ranking, index) =>
+        this.prisma.ranking.update({
+          where: {
+            id: ranking.id,
+          },
+          data: {
+            rank: index + 1,
+          },
+        }),
+      ),
+    );
 
     return {
       message: 'Ranking successfully recalculated.',
       jobId,
       processedStudents: students.length,
+      totalRankings: rankings.length,
     };
   }
 
@@ -241,8 +260,9 @@ export class RankingService {
     return rank;
   }
 
-  async findTop(jobId: string, limit: number = 10) {
+  async findTop(jobId?: string, limit: number = 10) {
     const rankings = await this.prisma.ranking.findMany({
+      where: jobId ? { jobId } : undefined,
       take: limit,
       orderBy: {
         rank: 'asc',

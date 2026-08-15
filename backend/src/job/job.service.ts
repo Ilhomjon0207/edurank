@@ -36,14 +36,6 @@ export class JobService {
 
   findAll() {
     return this.prisma.job.findMany({
-      include: {
-        JobSkill: {
-          include: {
-            Skill: true,
-          },
-        },
-        Application: true,
-      },
       orderBy: {
         createdAt: 'desc',
       },

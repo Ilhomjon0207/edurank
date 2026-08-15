@@ -10,7 +10,6 @@ import {
 import { RankingService } from './ranking.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators';
-import * as JwtPayload from '../common/interfaces/JwtPayload';
 import * as JwtPayload_2 from '../common/interfaces/JwtPayload';
 
 @ApiBearerAuth('JWT')
@@ -24,10 +23,10 @@ export class RankingController {
   }
   @Post('calculate/:jobId')
   calculate(
-    @Param('jobId', ParseIntPipe) jobId: string,
-    @CurrentUser() user: JwtPayload.IJwtPayload,
+    @Param('jobId') jobId: string,
+    @CurrentUser() user: JwtPayload_2.IJwtPayload,
   ) {
-    return this.rankingService.calculate(jobId, user.sub);
+    return this.rankingService.calculate(jobId, user.id);
   }
   @Get()
   findAll() {
@@ -37,8 +36,11 @@ export class RankingController {
   findTop(
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
     limit: number,
+
+    @Query('jobId')
+    jobId?: string,
   ) {
-    return this.rankingService.findTop(String(limit));
+    return this.rankingService.findTop(jobId, limit);
   }
   @Get('me')
   myRanking(@CurrentUser() user: JwtPayload_2.IJwtPayload) {
