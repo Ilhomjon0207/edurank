@@ -1,12 +1,12 @@
 <p-card>
 
-<div class="flex gap-3 mb-4">
+<div class="flex  flex-col md:flex-row gap-3 mb-4">
 
     <p-select
         [options]="jobs()"
         optionLabel="title"
         optionValue="id"
-        class="w-100"
+        class=" w-full md:w-100"
         placeholder="Select job"
         (onChange)="onJobChange($event.value)"
     />
@@ -14,6 +14,7 @@
     <p-button
         label="Calculate Ranking"
         icon="pi pi-chart-bar"
+        class="w-full! flex-1 md:w-auto"
         [disabled]="!selectedJobId()"
         [loading]="loading()"
         (onClick)="calculate()"
@@ -22,7 +23,7 @@
 </div>
     @if (selectedJob(); as job) {
         <div
-            class="flex align-items-center gap-2 mb-8
+            class="flex items-center gap-2 mb-8
                surface-card border-b-1 border-primary
            px-3 py-2"
         >
@@ -41,9 +42,10 @@
     }
     <p-table [value]="candidates()"
     [loading]="loading()"
+             class="!w-full"
     >
         <ng-template pTemplate="header">
-            <tr>
+            <tr class="hidden md:table-row w-full">
                 <th>#</th>
                 <th>Candidate</th>
                 <th>Email</th>
@@ -55,7 +57,7 @@
         </ng-template>
 
         <ng-template pTemplate="body" let-item>
-            <tr>
+            <tr class="hidden md:table-row w-full">
                 <td>
                     {{ item.rank }}
                 </td>
@@ -91,9 +93,91 @@
                     />
                 </td>
             </tr>
+            <tr class="table w-full md:hidden">
+                <p-card
+                    class="surface-card w-full border border-gray-200
+                   rounded-xl p-3 mb-2"
+                >
+                    <div class="flex items-center justify-between">
+
+                        <div class="flex items-center gap-2">
+
+                            <div
+                                class="flex items-center justify-center
+                               border-circle bg-primary-100"
+                                style="width: 2.5rem; height: 2.5rem;"
+                            >
+                                <i class="pi pi-user text-primary"></i>
+                            </div>
+
+                            <div>
+                                <div class="font-semibold">
+                                    {{ item.student.name }}
+                                </div>
+
+                                <small class="text-500">
+                                    #{{ item.rank }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <div class="text-right">
+                            <small class="text-500 block">
+                                Score
+                            </small>
+
+                            <span class="font-bold text-primary">
+                        {{ item.score }}
+                    </span>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="flex justify-between
+                       border-top border-gray-200
+                       mt-3 pt-3"
+                    >
+
+                        <div>
+                            <small class="text-500 block">
+                                GPA
+                            </small>
+
+                            <span class="font-medium">
+                        {{ item.student.gpa }}
+                    </span>
+                        </div>
+
+                        <div>
+                            <small class="text-500 block">
+                                Experience
+                            </small>
+
+                            <span class="font-medium">
+                        {{ item.student.experience }} months
+                    </span>
+                        </div>
+
+                        <p-button
+                            icon="pi pi-eye"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="secondary"
+                            pTooltip="Details"
+                            tooltipPosition="top"
+                            (onClick)="openCandidate(item)"
+                        />
+
+                    </div>
+
+                </p-card>
+            </tr>
         </ng-template>
     </p-table>
 </p-card>
+
 <p-dialog
     header="Candidate Details"
     [modal]="true"
