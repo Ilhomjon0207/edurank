@@ -5,9 +5,11 @@ export interface IJob {
     minGpa: number;
     deadline: string | null;
     minExperience: number;
-    createdAt: string;
-    updatedAt: string;
 }
 
-export type IJobsList = Pick<IJob, 'id' | 'title' | 'description' >;
+export type IJobsList = Pick<IJob, 'id' | 'title' | 'description'>;
 
+export interface ICreateJob {}
+
+export interface ICreateJobResponse {}
+export interface IJobUpdate {}

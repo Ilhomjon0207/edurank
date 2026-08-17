@@ -12,7 +12,11 @@ const routes: Routes = [
     {
         path: 'ranking',
         loadComponent: () => import('./ranking/ranking').then((m) => m.Ranking)
-    }
+    },
+    {
+        path: 'jobs',
+        loadComponent: () => import('./jobs/jobs').then((j) => j.Jobs)
+    },
 ];
 
 export default routes;

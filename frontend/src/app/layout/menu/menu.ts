@@ -20,7 +20,8 @@ export class Menu {
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] },
                     { label: 'Applications', icon: 'pi pi-fw pi-file', routerLink: ['/applications'] },
-                    { label: 'Ranking', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/ranking'] }
+                    { label: 'Ranking', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/ranking'] },
+                    { label: 'Jobs', icon: 'pi pi-fw pi-briefcase', routerLink: ['/jobs'] },
                 ]
             },
             {

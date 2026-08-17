@@ -1,0 +1,74 @@
+<p-card>
+    <div class="flex justify-between">
+
+        <p-button [pTooltip]="'Create job'" ><i class="pi pi-plus"></i></p-button>
+        <div class="mb-10 mr-10">
+            <p-iconfield iconPosition="left">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText pSize="small" type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search" />
+            </p-iconfield>
+        </div>
+    </div>
+    <p-table
+    [value]="jobs()"
+    #dt1
+    [paginator]="'true'" [rows]="12"
+    [globalFilterFields]="['title','description','minGpa','deadline','minExperience']"
+    >
+        <ng-template #header>
+            <tr>
+                <th>
+                    №
+                </th>
+                <th>
+                    title
+                </th>
+                <th>
+                    description
+                </th>
+                <th>
+                    minGpa
+                </th>
+                <th>
+                    deadline
+                </th>
+                <th>
+                    minExperience
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-job let-rowIndex="rowIndex">
+            <tr>
+                <td>
+                    {{rowIndex+1}}
+                </td>
+                <td>
+                    {{job.title}}
+                </td> <td>
+                    {{job.description}}
+                </td> <td>
+                    {{job.minGpa}}
+                </td>
+                <td>
+                    {{job.deadline}}
+                </td>
+                <td>
+                    {{job.minExperience}}
+                </td>
+                <td>
+                    <div class="flex gap-1">
+                    <p-button [pTooltip]="'View detail'"  [tooltipPosition]="'top'" severity="primary" variant="outlined" size="small" ><i class="pi pi-eye"></i></p-button>
+                    <p-button [pTooltip]="'Edit'"  [tooltipPosition]="'top'" severity="primary" variant="outlined" size="small" ><i class="pi pi-pencil"></i></p-button>
+                    <p-button [pTooltip]="'Delete'"  [tooltipPosition]="'top'" severity="danger" variant="outlined" size="small" ><i class="pi pi-trash"></i></p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-card>
