@@ -1,11 +1,6 @@
-import {Controller} from '@nestjs/common';
-import {PrismaService} from "./prisma/prisma.service";
+import { Controller } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private prisma: PrismaService) {}
-
-  async test() {
-    return this.prisma.user.findMany();
-  }
+  constructor() {}
 }

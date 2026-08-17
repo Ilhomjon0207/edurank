@@ -72,7 +72,6 @@ export class Applications implements OnInit {
         this.service.getApplicationById(id).subscribe({
             next: (data) => {
                 this.detailApplication.set(data);
-                console.log(this.detailApplication());
             },
             error: (error) => {
                 console.error('Error fetching application details:', error);

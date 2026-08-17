@@ -127,18 +127,6 @@ export class RankingService {
         rank: null,
       },
     });
-    console.log('STUDENT:', {
-      id: student.id,
-      name: student.name,
-      profile: student.Profile,
-      skills: student.UserSkill,
-    });
-
-    console.log('JOB:', {
-      id: job.id,
-      title: job.title,
-      skills: job.JobSkill,
-    });
     return {
       student: student.name,
       job: job.title,
