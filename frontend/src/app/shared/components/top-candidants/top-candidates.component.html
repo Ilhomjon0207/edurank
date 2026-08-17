@@ -6,18 +6,18 @@
             <p-menu #menu [popup]="true" [model]="items"></p-menu>
         </div>
     </div>
-    <ul class="list-none !w-full p-0 m-0">
-        @for (candidate of candidates();track candidate.student.id){
+    <ul class="list-none w-full! p-0 m-0">
+        @for (candidate of candidates();track candidate.id){
 
 
-        <li class="flex !w-full flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <li class="flex w-full! flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-                <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">{{candidate.student.name}}</span>
-                <div class="mt-1 text-muted-color">{{candidate.student.email}}</div>
+                <span class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">{{candidate.name}}</span>
+                <div class="mt-1 text-muted-color">{{candidate.email}}</div>
             </div>
             <div class="mt-2 md:mt-0 flex items-center">
                 <div
-                    class="rounded-border w-full overflow-hidden w-40 lg:w-24 bg-surface-300 dark:bg-surface-500"
+                    class="rounded-border w-full overflow-hidden lg:w-24 bg-surface-300 dark:bg-surface-500"
                     style="height: 8px"
                 >
                     <div
