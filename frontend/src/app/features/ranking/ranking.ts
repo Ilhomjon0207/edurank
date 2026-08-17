@@ -1,19 +1,22 @@
-import {ChangeDetectionStrategy, Component, inject, OnInit, signal} from '@angular/core';
-import {Select} from 'primeng/select';
-import {Button} from 'primeng/button';
-import {IJobsList, IRankingTop} from '@/app/core/interfaces';
-import {Card} from 'primeng/card';
-import {RankingService} from '@/app/features/ranking/ranking.service';
-import {MessageService} from 'primeng/api';
-import {TableModule} from 'primeng/table';
-import {Toast} from "primeng/toast";
-import {Dialog} from "primeng/dialog";
-import {Tag} from "primeng/tag";
-import {Tooltip} from "primeng/tooltip";
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { Select } from 'primeng/select';
+import { Button } from 'primeng/button';
+import { IJobsList, IRankingTop } from '@/app/core/interfaces';
+import { Card } from 'primeng/card';
+import { RankingService } from '@/app/features/ranking/ranking.service';
+import { MessageService } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { Toast } from 'primeng/toast';
+import { Dialog } from 'primeng/dialog';
+import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
     selector: 'app-ranking',
-    imports: [Select, Button, Card, TableModule, Toast, Dialog, Tag, Tooltip],
+    imports: [Select, Button, Card, TableModule, Toast, Dialog, Tag, Tooltip, IconField, InputIcon, InputText],
     templateUrl: './ranking.html',
     styleUrl: './ranking.scss',
     standalone: true,
@@ -25,6 +28,7 @@ export class Ranking implements OnInit {
     jobs = signal<IJobsList[]>([]);
     selectedJobId = signal('');
     selectedJob = signal<string>('');
+    limit = signal(0);
     candidates = signal<IRankingTop[]>([]);
     private service = inject(RankingService);
     private messageService = inject(MessageService);
@@ -32,7 +36,7 @@ export class Ranking implements OnInit {
         this.loading.set(true);
 
         this.service.calculatingByJob(this.selectedJobId()).subscribe({
-            next: (res) => {
+            next: () => {
                 this.loading.set(false);
                 this.loadCandidates();
                 this.messageService.add({
@@ -50,6 +54,10 @@ export class Ranking implements OnInit {
     onJobChange(id: string) {
         this.selectedJobId.set(id);
     }
+    setLimit(limit: number) {
+        this.limit.set(limit);
+    }
+
     selectedCandidate = signal<IRankingTop | null>(null);
     candidateDialogVisible = signal(false);
 

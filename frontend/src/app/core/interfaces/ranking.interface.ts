@@ -1,13 +1,9 @@
-export interface IRankingTop{
-    rank: number,
-    score: number,
-    student: IStudent
-}
-
-interface IStudent{
+export interface IRankingTop {
+    rank: number;
+    score: number;
     id: number;
     name: string;
-    email: string
-    gpa: number,
-    experience:number
+    email: string;
+    gpa: number;
+    experience: number;
 }

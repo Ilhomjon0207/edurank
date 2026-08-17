@@ -1,30 +1,38 @@
 <p-card>
 
-<div class="flex  flex-col md:flex-row gap-3 mb-4">
+    <div class="flex  flex-col md:flex-row gap-3 mb-4">
 
-    <p-select
-        [options]="jobs()"
-        optionLabel="title"
-        optionValue="id"
-        class=" w-full md:w-100"
-        placeholder="Select job"
-        (onChange)="onJobChange($event.value)"
-    />
+        <p-select
+            [options]="jobs()"
+            optionLabel="title"
+            optionValue="id"
+            class=" w-full md:w-100"
+            placeholder="Select job"
+            (onChange)="onJobChange($event.value)"
+        />
 
-    <p-button
-        label="Calculate Ranking"
-        icon="pi pi-chart-bar"
-        class="w-full! flex-1 md:w-auto"
-        [disabled]="!selectedJobId()"
-        [loading]="loading()"
-        (onClick)="calculate()"
-    />
-
-</div>
+        <p-button
+            label="Calculate Ranking"
+            icon="pi pi-chart-bar"
+            class="w-full! flex-1 md:w-auto"
+            [disabled]="!selectedJobId()"
+            [loading]="loading()"
+            (onClick)="calculate()"
+        />
+        <div>
+            <p-iconfield iconPosition="left">
+                <p-inputicon>
+                    <i class="pi pi-search"></i>
+                </p-inputicon>
+                <input pInputText pSize="small" type="text"
+                       (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
+            </p-iconfield>
+        </div>
+    </div>
     @if (selectedJob(); as job) {
         <div
             class="flex items-center gap-2 mb-8
-               surface-card border-b-1 border-primary
+               surface-card border-b border-primary
            px-3 py-2"
         >
             <i class="pi pi-briefcase text-primary"></i>
@@ -40,19 +48,25 @@
             <i class="pi pi-check-circle text-green-500 ml-1"></i>
         </div>
     }
+
     <p-table [value]="candidates()"
-    [loading]="loading()"
-             class="!w-full"
+             [loading]="loading()"
+             class="w-full!"
+             [paginator]="true"
+             [globalFilterFields]="['rank','name','gpa','email','id']"
+             [rows]="10"
+             #dt1
+
     >
         <ng-template pTemplate="header">
             <tr class="hidden md:table-row w-full">
-                <th>#</th>
-                <th>Candidate</th>
-                <th>Email</th>
-                <th>GPA</th>
-                <th>Experience</th>
-                <th>Score</th>
-                <th>Action</th>
+                <th pSortableColumn="rank" ># <p-sortIcon field="rank" /></th>
+                <th pSortableColumn="rank">Candidate <p-sortIcon field="name" /></th>
+                <th pSortableColumn="email">Email<p-sortIcon field="email" /></th>
+                <th pSortableColumn="gpa">GPA<p-sortIcon field="gpa" /></th>
+                <th pSortableColumn="experience">Experience<p-sortIcon field="experience" /></th>
+                <th pSortableColumn="score">Score<p-sortIcon field="score" /></th>
+                <th >Action</th>
             </tr>
         </ng-template>
 
@@ -63,19 +77,19 @@
                 </td>
 
                 <td>
-                    {{ item.student.name }}
+                    {{ item.name }}
                 </td>
 
                 <td>
-                    {{ item.student.email }}
+                    {{ item.email }}
                 </td>
 
                 <td>
-                    {{ item.student.gpa }}
+                    {{ item.gpa }}
                 </td>
 
                 <td>
-                    {{ item.student.experience }} months
+                    {{ item.experience }} months
                 </td>
 
                 <td>
@@ -112,7 +126,7 @@
 
                             <div>
                                 <div class="font-semibold">
-                                    {{ item.student.name }}
+                                    {{ item.name }}
                                 </div>
 
                                 <small class="text-500">
@@ -146,7 +160,7 @@
                             </small>
 
                             <span class="font-medium">
-                        {{ item.student.gpa }}
+                        {{ item.gpa }}
                     </span>
                         </div>
 
@@ -156,7 +170,7 @@
                             </small>
 
                             <span class="font-medium">
-                        {{ item.student.experience }} months
+                        {{ item.experience }} months
                     </span>
                         </div>
 
@@ -202,7 +216,7 @@
 
                 <div class="flex items-center gap-2">
                     <span class="font-semibold text-900">
-                        {{ candidate.student.name }}
+                        {{ candidate.name }}
                     </span>
 
                     <p-tag
@@ -212,7 +226,7 @@
                 </div>
 
                 <small class="text-500">
-                    {{ candidate.student.email }}
+                    {{ candidate.email }}
                 </small>
 
             </div>
@@ -256,7 +270,7 @@
                     </div>
 
                     <div class="font-semibold mt-1">
-                        {{ candidate.student.gpa }}
+                        {{ candidate.gpa }}
                     </div>
                 </div>
             </div>
@@ -276,7 +290,7 @@
                     </div>
 
                     <div class="font-semibold mt-1">
-                        {{ candidate.student.experience }}
+                        {{ candidate.experience }}
                         <small class="text-500">
                             months
                         </small>

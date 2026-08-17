@@ -248,10 +248,12 @@ export class RankingService {
     return rank;
   }
 
-  async findTop(jobId?: string, limit: number = 10) {
+  async findTop(jobId?: string, limit?: number) {
     const rankings = await this.prisma.ranking.findMany({
       where: jobId ? { jobId } : undefined,
-      take: limit,
+      ...(limit !== undefined && {
+        take: limit,
+      }),
       orderBy: {
         rank: 'asc',
       },
@@ -275,13 +277,11 @@ export class RankingService {
     return rankings.map((item) => ({
       rank: item.rank,
       score: Number(item.score.toFixed(2)),
-      student: {
-        id: item.User.id,
-        name: item.User.name,
-        email: item.User.email,
-        gpa: item.User.Profile?.gpa ?? 0,
-        experience: item.User.Profile?.experienceMonths ?? 0,
-      },
+      id: item.User.id,
+      name: item.User.name,
+      email: item.User.email,
+      gpa: item.User.Profile?.gpa ?? 0,
+      experience: item.User.Profile?.experienceMonths ?? 0,
     }));
   }
   async findMyRanking(userId: string) {

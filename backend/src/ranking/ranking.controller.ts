@@ -1,12 +1,4 @@
-import {
-  Controller,
-  DefaultValuePipe,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { RankingService } from './ranking.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators';
@@ -34,7 +26,7 @@ export class RankingController {
   }
   @Get('top')
   findTop(
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
+    @Query('limit')
     limit: number,
 
     @Query('jobId')
