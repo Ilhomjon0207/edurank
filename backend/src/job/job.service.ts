@@ -14,7 +14,9 @@ export class JobService {
         title: createJobDto.title,
         description: createJobDto.description,
         minGpa: createJobDto.minGpa,
-        deadline: createJobDto.deadline,
+        deadline: createJobDto.deadline
+          ? new Date(createJobDto.deadline)
+          : null,
         minExperience: createJobDto.minExperience,
 
         JobSkill: {

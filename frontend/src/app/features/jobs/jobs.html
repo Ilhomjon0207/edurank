@@ -1,7 +1,7 @@
 <p-card>
     <div class="flex justify-between">
 
-        <p-button [pTooltip]="'Create job'" ><i class="pi pi-plus"></i></p-button>
+        <p-button [pTooltip]="'Create job'" (click)="openDialog()" ><i class="pi pi-plus"></i></p-button>
         <div class="mb-10 mr-10">
             <p-iconfield iconPosition="left">
                 <p-inputicon>
@@ -72,3 +72,189 @@
         </ng-template>
     </p-table>
 </p-card>
+
+
+<p-dialog
+[visible]='visible()'
+[modal]="true"
+class="w-100!"
+[style]="{width:'300px'}"
+>
+
+    <div class="flex">
+        <form [formGroup]="jobForm" (ngSubmit)="createJob()">
+
+            <div class="grid">
+
+                <!-- Title -->
+                <div class="col-12">
+                    <label class="block mb-2 font-medium">
+                        Job Title
+                    </label>
+
+                    <input
+                        pInputText
+                        formControlName="title"
+                        class="w-full"
+                        placeholder="Frontend Developer"
+                    />
+                </div>
+
+                <!-- Description -->
+                <div class="col-12">
+                    <label class="block mb-2 font-medium">
+                        Description
+                    </label>
+
+                    <textarea
+                        pTextarea
+                        formControlName="description"
+                        rows="3"
+                        class="w-full"
+                        placeholder="Job description..."
+                    ></textarea>
+                </div>
+
+                <!-- GPA -->
+                <div class="col-12 md:col-6">
+                    <label class="block mb-2 font-medium">
+                        Minimum GPA
+                    </label>
+
+                    <p-inputNumber
+                        formControlName="minGpa"
+                        [min]="0"
+                        [max]="4"
+                        [minFractionDigits]="1"
+                        [maxFractionDigits]="2"
+                        class="w-full"
+                    />
+                </div>
+
+                <!-- Experience -->
+                <div class="col-12 md:col-6">
+                    <label class="block mb-2 font-medium">
+                        Minimum Experience
+                    </label>
+
+                    <p-inputNumber
+                        formControlName="minExperience"
+                        [min]="0"
+                        suffix=" months"
+                        class="w-full"
+                    />
+                </div>
+
+                <!-- Deadline -->
+                <div class="col-12">
+                    <label class="block mb-2 font-medium">
+                        Application Deadline
+                    </label>
+
+                    <p-datepicker
+                        formControlName="deadline"
+                        [showIcon]="true"
+                        [minDate]="today"
+                        dateFormat="yy-mm-dd"
+                        styleClass="w-full"
+                    />
+                </div>
+
+                <!-- Skills -->
+                <div class="col-12">
+
+                    <div class="flex items-center justify-between mb-2">
+
+                        <label class="font-medium">
+                            Required Skills
+                        </label>
+
+                        <p-button
+                            type="button"
+                            icon="pi pi-plus"
+                            label="Add Skill"
+                            size="small"
+                            [text]="true"
+                            (onClick)="addSkill()"
+                        />
+
+                    </div>
+
+                    <div formArrayName="skills">
+
+                        @for (
+                            skill of skills.controls;
+                            track $index
+                            ) {
+
+                            <div
+                                [formGroupName]="$index"
+                                class="flex items-center gap-2 mb-2"
+                            >
+
+                                <!-- Skill -->
+                                <p-select
+                                    formControlName="skillId"
+                                    [options]="skillsOptions"
+                                    optionLabel="name"
+                                    optionValue="id"
+                                    placeholder="Select skill"
+                                    class="flex-1"
+                                />
+
+                                <!-- Level -->
+                                <p-inputNumber
+                                    formControlName="requiredLevel"
+                                    [min]="1"
+                                    [max]="5"
+                                    placeholder="Level"
+                                    styleClass="w-6rem"
+                                />
+
+                                <!-- Remove -->
+                                <p-button
+                                    type="button"
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    [text]="true"
+                                    [rounded]="true"
+                                    (onClick)="removeSkill($index)"
+                                />
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+
+            <div
+                class="flex justify-content-end gap-2
+               border-top-1 border-200 pt-3 mt-3"
+            >
+
+                <p-button
+                    type="button"
+                    label="Cancel"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="closeDialog()"
+                />
+
+                <p-button
+                    type="submit"
+                    label="Create Job"
+                    icon="pi pi-plus"
+                    [loading]="loading()"
+                    [disabled]="jobForm.invalid"
+                />
+
+            </div>
+
+        </form>
+    </div>
+</p-dialog>
