@@ -94,6 +94,7 @@
 <p-dialog
     [visible]='visible()'
     [modal]="true"
+    (visibleChange)="visible.set($event)"
     class="w-100!"
     [style]="{width:'400px'}"
     [header]="'Create a job'"
@@ -249,8 +250,10 @@
 </p-dialog>
 <p-dialog
     [visible]="editVisible()"
+    (visibleChange)="editVisible.set($event)"
     [modal]="true"
     [style]="{ width: '500px' }"
+    [closable]="true"
 >
     <ng-template pTemplate="header">
         <div class="flex items-center gap-2">
