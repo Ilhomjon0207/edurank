@@ -5,26 +5,28 @@ import { environment } from '@/environments/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root'
 })
-export class JobsService extends BaseCrudService<IJob, ICreateJob, IJobUpdate>{
-
+export class JobsService extends BaseCrudService<IJob, ICreateJob, IJobUpdate> {
     constructor() {
-        super('/jobs')
+        super('/jobs');
     }
 
-    getAllJobs(){
+    getAllJobs(): Observable<IJob[]> {
         return this.getAll();
     }
 
-    createJob(job: ICreateJob){
+    createJob(job: ICreateJob) {
         return this.create(job);
     }
-    getSkills():Observable<ISkills[]> {
-        return this.http.get<ISkills[]>(`${environment.apiUrl}/skills`)
+    getSkills(): Observable<ISkills[]> {
+        return this.http.get<ISkills[]>(`${environment.apiUrl}/skills`);
     }
 
-    deleteJob(id:string):Observable<any> {
-        return this.delete(id)
+    deleteJob(id: string): Observable<any> {
+        return this.delete(id);
     }
+    updateJob(id:string,job: ICreateJob) {
+        return this.update(id,job)
+    };
 }

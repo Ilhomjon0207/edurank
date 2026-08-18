@@ -36,8 +36,8 @@ export class JobService {
     });
   }
 
-  findAll() {
-    return this.prisma.job.findMany({
+  async findAll() {
+    const jobs = await this.prisma.job.findMany({
       orderBy: [
         {
           isActive: 'desc',
@@ -46,7 +46,37 @@ export class JobService {
           createdAt: 'desc',
         },
       ],
+      include: {
+        JobSkill: {
+          include: {
+            Skill: true,
+          },
+        },
+      },
     });
+
+    return jobs.map((job) => ({
+      id: job.id,
+      title: job.title,
+      description: job.description,
+      minGpa: job.minGpa,
+      deadline: job.deadline,
+      minExperience: job.minExperience,
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+      isActive: job.isActive,
+
+      skills: job.JobSkill.map((item) => ({
+        skillId: item.skillId,
+        requiredLevel: item.requiredLevel,
+
+        skill: {
+          id: item.Skill.id,
+          name: item.Skill.name,
+          description: item.Skill.description,
+        },
+      })),
+    }));
   }
 
   async findOne(id: string) {

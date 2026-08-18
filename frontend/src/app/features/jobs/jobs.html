@@ -67,13 +67,19 @@
                 <td>
                     {{ job.minExperience }}
                 </td>
-                <td><p-tag [severity]="getJobStatus(job.isActive).type"> {{getJobStatus(job.isActive).label}}</p-tag>
+                <td>
+                    @let status = getJobStatus(job.isActive);
+
+                    <p-tag
+                        [severity]="status.type"
+                        [value]="status.label"
+                    />
                 </td>
                 <td>
                     <div class="flex gap-1">
                         <p-button [pTooltip]="'View detail'" [tooltipPosition]="'top'" severity="primary"
                                   variant="outlined" size="small"><i class="pi pi-eye"></i></p-button>
-                        <p-button [pTooltip]="'Edit'" [tooltipPosition]="'top'" severity="primary" variant="outlined"
+                        <p-button [pTooltip]="'Edit'" (click)="editJob(job)" [tooltipPosition]="'top'" severity="primary" variant="outlined"
                                   size="small"><i class="pi pi-pencil"></i></p-button>
                         <p-button [pTooltip]="'Delete'"  (onClick)="deleteJob(job.id,$event)" [tooltipPosition]="'top'" severity="danger" variant="outlined"
                                   size="small"><i class="pi pi-trash"></i></p-button>
@@ -113,13 +119,12 @@
                     Description
                 </label>
 
-                <textarea
-                    pTextarea
+                <input
+                    pInputText
                     [field]="jobForm.description"
-                    rows="3"
                     class="w-full"
                     placeholder="Job description..."
-                ></textarea>
+            />
             </div>
 
             <div class="col-12 mb-3 md:col-6">
@@ -242,6 +247,168 @@
         </form>
     </div>
 </p-dialog>
+<p-dialog
+    [visible]="editVisible()"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+>
+    <ng-template pTemplate="header">
+        <div class="flex items-center gap-2">
+            <i class="pi pi-pencil text-primary"></i>
 
+            <span class="font-semibold">
+                Edit Job
+            </span>
+        </div>
+    </ng-template>
+
+    <form (ngSubmit)="updateJob()">
+
+        <div class="flex flex-col gap-3">
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Job Title
+                </label>
+
+                <input
+                    pInputText
+                    [field]="editJobForm.title"
+                    class="w-full"
+                />
+            </div>
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Description
+                </label>
+
+                <input
+                    pInputText
+                    [field]="editJobForm.description"
+                    class="w-full"
+                />
+            </div>
+
+
+
+                <div class="col-24">
+                    <label class="block mb-2 font-medium">
+                        Minimum GPA
+                    </label>
+
+                    <p-inputNumber
+                        [field]="editJobForm.minGpa"
+                        [min]="0"
+                        [max]="4"
+                        [minFractionDigits]="1"
+                        [maxFractionDigits]="2"
+                        styleClass="w-full"
+                    />
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <label class="block mb-2 font-medium">
+                        Experience
+                    </label>
+
+                    <p-inputNumber
+                        [field]="editJobForm.minExperience"
+                        [min]="0"
+                        suffix=" months"
+                        styleClass="w-full"
+                    />
+                </div>
+
+
+            <div>
+                <label class="block mb-2 font-medium">
+                    Application Deadline
+                </label>
+
+                <p-datepicker
+                    [field]="editJobForm.deadline"
+                    [showIcon]="true"
+                    fluid
+                    dateFormat="yy-mm-dd"
+                    styleClass="w-full"></p-datepicker>
+            </div>
+
+            <div>
+
+                <div class="flex items-center justify-between mb-2">
+                    <label class="font-medium">
+                        Required Skills
+                    </label>
+
+                    <p-button
+                        type="button"
+                        icon="pi pi-plus"
+                        label="Add Skill"
+                        size="small"
+                        [text]="true"
+                        (onClick)="addEditSkill()"
+                    />
+                </div>
+
+                @for (skill of editJobModel().skills; track $index) {
+
+                    <div class="flex items-center gap-2 mb-2">
+
+                        <p-select
+                            [options]="skillsOptions()"
+                            optionLabel="name"
+                            optionValue="id"
+                            [field]="editJobForm.skills[$index].skillId"
+                            placeholder="Skill"
+                            class="flex-1"
+                        />
+
+                        <p-inputNumber
+                            [field]="editJobForm.skills[$index].requiredLevel"
+                            [min]="1"
+                            [max]="5"
+                            placeholder="Level"
+                            styleClass="w-6rem"
+                        />
+
+                        <p-button
+                            type="button"
+                            icon="pi pi-trash"
+                            severity="danger"
+                            [text]="true"
+                            [rounded]="true"
+                            (onClick)="removeEditSkill($index)"
+                        />
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="flex justify-end gap-2 border-top-1  pt-3 mt-4">
+
+            <p-button
+                type="button"
+                label="Cancel"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="editVisible.set(false)"
+            />
+
+            <p-button
+                type="submit"
+                label="Save Changes"
+                icon="pi pi-check"
+
+                [loading]="loading()"
+            />
+
+        </div>
+
+    </form>
+</p-dialog>
 <p-toast/>
-<p-confirmdialog />
+<p-confirmdialog></p-confirmdialog>

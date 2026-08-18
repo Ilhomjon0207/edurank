@@ -1,10 +1,13 @@
+import { IJobSkill } from '@/app/core/interfaces/skills.interface';
+
 export interface IJob {
     id: string;
     title: string;
     description: string;
     minGpa: number;
     isActive:boolean;
-    deadline: string | null;
+    deadline: string ;
+    skills:IJobSkill[];
     minExperience: number;
 }
 

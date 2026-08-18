@@ -9,10 +9,9 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
 import { Dialog } from 'primeng/dialog';
-import { form, max, min, required, schema, Field } from '@angular/forms/signals';
+import { Field, form, max, min, required, schema } from '@angular/forms/signals';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
-import { Textarea } from 'primeng/textarea';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -21,9 +20,10 @@ import { DatePipe } from '@angular/common';
 import { Tag } from 'primeng/tag';
 import { Severity } from '@/app/core/types';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 @Component({
     selector: 'app-jobs',
-    imports: [Card, TableModule, Button, IconField, InputIcon, InputText, Tooltip, ConfirmDialogModule, Dialog, ReactiveFormsModule, DatePicker, Textarea, InputNumber, Select, FormsModule, Field, Toast, DatePipe, Tag],
+    imports: [Card, TableModule, Button, IconField, InputIcon, InputText, Tooltip, ConfirmDialogModule, Dialog, ReactiveFormsModule, DatePicker, InputNumber, Select, FormsModule, Field, Toast, DatePipe, Tag],
     templateUrl: './jobs.html',
     styleUrl: './jobs.scss',
     standalone: true,
@@ -37,6 +37,8 @@ export class Jobs implements OnInit {
     today = new Date();
     skillsOptions = signal<ISkills[]>([]);
     skills = signal<ISkills[]>([]);
+    editVisible = signal(false);
+    editJobId = signal<string>('');
     jobModel = signal({
         title: '',
         description: '',
@@ -69,6 +71,88 @@ export class Jobs implements OnInit {
             min(path.minExperience, 0);
         })
     );
+
+    editJobModel = signal({
+        title: '',
+        description: '',
+        minGpa: 0,
+        minExperience: 0,
+        deadline: new Date(),
+
+        skills: [] as {
+            skillId: string;
+            requiredLevel: number;
+        }[]
+    });
+
+    editJobForm = form(
+        this.editJobModel,
+        schema((path) => {
+            required(path.title);
+
+            min(path.minGpa, 0);
+            max(path.minGpa, 4);
+
+            min(path.minExperience, 0);
+        })
+    );
+    editJob(job: IJob) {
+        this.editJobId.set(job.id);
+
+        this.editJobModel.set({
+            title: job.title,
+            description: job.description ?? '',
+            minGpa: job.minGpa ?? 0,
+            minExperience: job.minExperience ?? 0,
+
+            deadline: job.deadline ? new Date(job.deadline) : new Date(),
+
+            skills: job.skills.map((item) => ({
+                skillId: item.skillId,
+                requiredLevel: item.requiredLevel
+            }))
+        });
+
+        this.editVisible.set(true);
+    }
+    addEditSkill() {
+        this.editJobModel.update((model) => ({
+            ...model,
+            skills: [
+                ...model.skills,
+                {
+                    skillId: '',
+                    requiredLevel: 1
+                }
+            ]
+        }));
+    }
+    removeEditSkill(index: number) {
+        this.editJobModel.update((model) => ({
+            ...model,
+            skills: model.skills.filter((_, i) => i !== index)
+        }));
+    }
+    updateJob() {
+        this.service.updateJob(this.editJobId(), this.editJobForm().value()).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    detail: 'Job updated successfully.'
+                });
+                this.editJobForm().reset();
+                this.editVisible.set(false);
+                this.loadJobs();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    detail: 'Job updated failed.'
+                });
+            }
+        });
+    }
+
     closeDialog() {
         this.visible.set(false);
     }
@@ -76,6 +160,7 @@ export class Jobs implements OnInit {
     openDialog() {
         this.visible.set(true);
     }
+
     addSkill() {
         this.jobModel.update((model) => ({
             ...model,
