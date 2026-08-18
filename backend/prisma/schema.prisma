@@ -57,7 +57,7 @@ model Job {
   minExperience     Int?
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
-
+  isActive    Boolean  @default(true)
   Application       Application[]
   AiRecommendations AiRecommendation[]
   JobSkill          JobSkill[]
@@ -70,7 +70,7 @@ model JobSkill {
   skillId       String
   requiredLevel Int
 
-  Job           Job   @relation(fields: [jobId], references: [id])
+  Job           Job   @relation(fields: [jobId], references: [id], onDelete:Cascade)
   Skill         Skill @relation(fields: [skillId], references: [id])
 
   @@unique([jobId, skillId])

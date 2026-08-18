@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { ApplicationStatus } from '@/app/core/enums';
 import { Tag } from 'primeng/tag';
-import { Severety } from '@/app/core/types';
+import { Severity } from '@/app/core/types';
 import { Button } from 'primeng/button';
 import { Tooltip } from 'primeng/tooltip';
 import { Dialog } from 'primeng/dialog';
@@ -39,7 +39,7 @@ export class Applications implements OnInit {
     dt1 = viewChild('dt1');
     globalFilter = '';
 
-    getStatusLabel(status: ApplicationStatus): { label: string; severity: Severety } {
+    getStatusLabel(status: ApplicationStatus): { label: string; severity: Severity } {
         switch (status) {
             case ApplicationStatus.PENDING:
                 return {

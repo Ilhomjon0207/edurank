@@ -3,6 +3,7 @@ export interface IJob {
     title: string;
     description: string;
     minGpa: number;
+    isActive:boolean;
     deadline: string | null;
     minExperience: number;
 }

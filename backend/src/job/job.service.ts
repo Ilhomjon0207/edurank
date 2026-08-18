@@ -38,9 +38,14 @@ export class JobService {
 
   findAll() {
     return this.prisma.job.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [
+        {
+          isActive: 'desc',
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
     });
   }
 
@@ -116,9 +121,12 @@ export class JobService {
   }
 
   remove(id: string) {
-    return this.prisma.job.delete({
+    return this.prisma.job.update({
       where: {
         id,
+      },
+      data: {
+        isActive: false,
       },
     });
   }
