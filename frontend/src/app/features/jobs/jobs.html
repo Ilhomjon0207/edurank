@@ -19,7 +19,7 @@
         [globalFilterFields]="['title','description','minGpa','deadline','minExperience']"
     >
         <ng-template #header>
-            <tr>
+            <tr class="hidden md:table-row w-full">
                 <th>
                     №
                 </th>
@@ -48,43 +48,165 @@
         </ng-template>
 
         <ng-template #body let-job let-rowIndex="rowIndex">
-            <tr>
+
+            @let status = getJobStatus(job.isActive);
+
+            <!-- Desktop -->
+            <tr class="hidden md:table-row">
                 <td>
                     {{ rowIndex + 1 }}
                 </td>
+
                 <td>
                     {{ job.title }}
                 </td>
+
                 <td>
                     {{ job.description }}
                 </td>
+
                 <td>
                     {{ job.minGpa }}
                 </td>
+
                 <td>
-                    {{ job.deadline | date:'dd-MM-yy hh-mm-ss' }}
+                    {{ job.deadline | date:'dd.MM.yy HH:mm' }}
                 </td>
+
                 <td>
                     {{ job.minExperience }}
                 </td>
-                <td>
-                    @let status = getJobStatus(job.isActive);
 
+                <td>
                     <p-tag
                         [severity]="status.type"
                         [value]="status.label"
                     />
                 </td>
+
                 <td>
                     <div class="flex gap-1">
-                        <p-button [pTooltip]="'View detail'" [tooltipPosition]="'top'" severity="primary"
-                                  variant="outlined" size="small"><i class="pi pi-eye"></i></p-button>
-                        <p-button [pTooltip]="'Edit'" (click)="editJob(job)" [tooltipPosition]="'top'" severity="primary" variant="outlined"
-                                  size="small"><i class="pi pi-pencil"></i></p-button>
-                        <p-button [pTooltip]="'Delete'"  (onClick)="deleteJob(job.id,$event)" [tooltipPosition]="'top'" severity="danger" variant="outlined"
-                                  size="small"><i class="pi pi-trash"></i></p-button>
+                        <p-button
+                            icon="pi pi-eye"
+                            pTooltip="View detail"
+                            tooltipPosition="top"
+                            severity="primary"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="viewJob(job)"
+                        />
+
+                        <p-button
+                            icon="pi pi-pencil"
+                            pTooltip="Edit"
+                            tooltipPosition="top"
+                            severity="primary"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="editJob(job)"
+                        />
+
+                        <p-button
+                            icon="pi pi-trash"
+                            pTooltip="Delete"
+                            tooltipPosition="top"
+                            severity="danger"
+                            variant="outlined"
+                            size="small"
+                            (onClick)="deleteJob(job.id, $event)"
+                        />
                     </div>
                 </td>
+            </tr>
+
+            <!-- Mobile -->
+            <tr class="md:hidden">
+                <td colspan="8" class="p-0! border-0! ">
+                    <div class="border rounded-md p-2 !mt-2 shadow-sm">
+
+                        <div class="flex justify-between items-center gap-2">
+                            <div class="min-w-0">
+                                <h5 class="font-medium text-xs! truncate">
+                                    {{ job.title }}
+                                </h5>
+
+                                <span class="text-[10px] text-gray-400">
+                        #{{ rowIndex + 1 }}
+                    </span>
+                            </div>
+
+                            <p-tag
+                                [severity]="status.type"
+                                [value]="status.label"
+                                styleClass="text-[10px]!"
+                            />
+                        </div>
+
+                        <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">
+                            {{ job.description }}
+                        </p>
+
+                        <div class="grid grid-cols-3 gap-1 mt-2 text-[10px]">
+
+                            <div>
+                                <span class="text-gray-400 block">GPA</span>
+                                <span class="font-medium">{{ job.minGpa }}</span>
+                            </div>
+
+                            <div>
+                                <span class="text-gray-400 block">Exp.</span>
+                                <span class="font-medium">{{ job.minExperience }}y</span>
+                            </div>
+
+                            <div>
+                                <span class="text-gray-400 block">Deadline</span>
+                                <span class="font-medium">
+                        {{ job.deadline | date:'dd.MM.yy' }}
+                    </span>
+                            </div>
+
+                        </div>
+
+                        <div class="flex gap-1 mt-2 pt-1 border-t">
+
+                            <p-button
+                                icon="pi pi-eye"
+                                size="small"
+                                variant="outlined"
+                                severity="primary"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="viewJob(job)"
+                            />
+
+                            <p-button
+                                icon="pi pi-pencil"
+                                size="small"
+                                variant="outlined"
+                                severity="primary"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="editJob(job)"
+                            />
+
+                            <p-button
+                                icon="pi pi-trash"
+                                size="small"
+                                variant="outlined"
+                                severity="danger"
+                                [style]="{width:'26px', height:'26px'}"
+                                (onClick)="deleteJob(job.id, $event)"
+                            />
+
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+
+        </ng-template>
+
+        <ng-template #emptymessage >
+            <tr>
+                <td colspan="8" class="!text-center">No data</td>
             </tr>
         </ng-template>
     </p-table>
@@ -412,6 +534,38 @@
         </div>
 
     </form>
+</p-dialog>
+<p-dialog
+    header="Job Details"
+    [visible]="viewVisible()"
+    [draggable]="false"
+    (visibleChange)="viewVisible.set($event)"
+    [modal]="true"
+    [closable]="true"
+    [style]="{ width: '600px' }"
+>
+    @if (selectedJob(); as job) {
+        <div>
+            <h3>{{ job.title }}</h3>
+
+            <p>{{ job.description }}</p>
+
+            <p>
+                <strong>Min GPA:</strong>
+                {{ job.minGpa }}
+            </p>
+
+            <p>
+                <strong>Experience:</strong>
+                {{ job.minExperience }} years
+            </p>
+
+            <p>
+                <strong>Deadline:</strong>
+                {{ job.deadline | date:'dd.MM.yyyy' }}
+            </p>
+        </div>
+    }
 </p-dialog>
 <p-toast/>
 <p-confirmdialog></p-confirmdialog>

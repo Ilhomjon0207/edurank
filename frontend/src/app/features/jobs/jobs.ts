@@ -38,6 +38,8 @@ export class Jobs implements OnInit {
     skillsOptions = signal<ISkills[]>([]);
     skills = signal<ISkills[]>([]);
     editVisible = signal(false);
+    selectedJob = signal<IJob | null>(null);
+    viewVisible = signal(false);
     editJobId = signal<string>('');
     jobModel = signal({
         title: '',
@@ -269,6 +271,10 @@ export class Jobs implements OnInit {
                 });
             }
         });
+    }
+    viewJob(job: IJob) {
+        this.selectedJob.set(job);
+        this.viewVisible.set(true);
     }
     ngOnInit() {
         this.loadJobs();
