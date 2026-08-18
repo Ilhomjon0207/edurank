@@ -31,4 +31,7 @@ export class TopCandidates {
         { label: 'Add New', icon: 'pi pi-fw pi-plus' },
         { label: 'Remove', icon: 'pi pi-fw pi-trash' }
     ];
+    getRankColor(rank: number | null | undefined) {
+        return this.colors[rank ?? 0] ?? this.colors[0];
+    }
 }
