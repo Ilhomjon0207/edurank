@@ -42,7 +42,7 @@
                 <td>
                     <p-tag [severity]="getStatusLabel(application.status).severity"> {{getStatusLabel(application.status).label}}</p-tag>
                 </td>
-                <td>{{ application.appliedAt | date:'dd-mm-yyyy' }}</td>
+                <td>{{ application.appliedAt | date:'dd-MM-yyyy' }}</td>
                 <td>
                     <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'"><i class="pi pi-eye"></i></p-button>
                 </td>
