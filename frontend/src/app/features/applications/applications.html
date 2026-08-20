@@ -9,7 +9,7 @@
     </div>
     <p-table #dt1 [value]="applications()" [paginator]="'true'" [rows]="12" [globalFilterFields]="['id','jobTitle','name','status','appliedAt']">
         <ng-template #header>
-            <tr>
+            <tr class="hidden md:table-row">
                 <th pSortableColumn="id">
                     №
                     <p-sortIcon field="id" />
@@ -35,7 +35,7 @@
         </ng-template>
 
         <ng-template #body let-application let-rowIndex="rowIndex">
-            <tr>
+            <tr class="hidden md:table-row">
                 <td>{{ rowIndex+1 }}</td>
                 <td>{{ application.jobTitle }}</td>
                 <td>{{ application.userName }}</td>
@@ -45,6 +45,79 @@
                 <td>{{ application.appliedAt | date:'dd-mm-yyyy' }}</td>
                 <td>
                     <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'"><i class="pi pi-eye"></i></p-button>
+                </td>
+            </tr>
+            <tr class="md:hidden">
+                <td colspan="6" class="p-0! border-0!">
+
+                    @let status = getStatusLabel(application.status);
+
+                    <div class="border rounded-md p-2 mt-2 shadow-sm">
+
+                        <div class="flex justify-between items-start gap-2">
+
+                            <div class="min-w-0">
+                                <h5 class="font-medium text-xs! truncate">
+                                    {{ application.jobTitle }}
+                                </h5>
+
+                                <span class="text-[10px] text-gray-400">
+                            #{{ rowIndex + 1 }}
+                        </span>
+                            </div>
+
+                            <p-tag
+                                [severity]="status.severity"
+                                [value]="status.label"
+                                styleClass="text-[10px]!"
+                            />
+
+                        </div>
+
+                        <div class="mt-2 text-[11px]">
+
+                            <div class="flex justify-between gap-2">
+                        <span class="text-gray-400">
+                            User
+                        </span>
+
+                                <span class="font-medium truncate">
+                            {{ application.userName }}
+                        </span>
+                            </div>
+
+                            <div class="flex justify-between mt-1">
+                        <span class="text-gray-400">
+                            Applied
+                        </span>
+
+                                <span class="font-medium">
+                            {{ application.appliedAt | date:'dd.MM.yy' }}
+                        </span>
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-end mt-2 pt-1 border-t">
+
+                            <p-button
+                                icon="pi pi-eye"
+                                variant="outlined"
+                                size="small"
+                                severity="primary"
+                                pTooltip="View application"
+                                tooltipPosition="top"
+                                [style]="{
+                            width: '26px',
+                            height: '26px'
+                        }"
+                                (onClick)="openDetails(application.id)"
+                            />
+
+                        </div>
+
+                    </div>
+
                 </td>
             </tr>
         </ng-template>
