@@ -1,43 +1,79 @@
 <div class="card">
-    <div class="flex justify-between items-center mb-6">
-        <div class="font-semibold text-xl">Top Ranked Candidates</div>
+
+    <div class="flex justify-between items-center mb-5">
+        <div class="font-semibold text-lg md:text-xl">
+            Top Ranked Candidates
+        </div>
+
         <div>
-            <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain"
-                    (click)="menu.toggle($event)"></button>
-            <p-menu #menu [popup]="true" [model]="items"></p-menu>
+            <button
+                pButton
+                type="button"
+                icon="pi pi-ellipsis-v"
+                class="p-button-rounded p-button-text p-button-plain"
+                (click)="menu.toggle($event)"
+            ></button>
+
+            <p-menu
+                #menu
+                [popup]="true"
+                [model]="items"
+            />
         </div>
     </div>
-    <ul class="list-none w-full! p-0 m-0">
+
+    <ul class="list-none w-full p-0 m-0">
+
         @for (candidate of candidates(); track candidate.id) {
 
+            <li class="mb-5 last:mb-0">
 
-            <li class="flex w-full! flex-col md:flex-row md:items-center md:justify-between mb-6">
-                <div>
+                <!-- Candidate -->
+                <div class="flex justify-between items-start gap-2">
+
+                    <div class="min-w-0">
+
+                        <span class="text-surface-900 dark:text-surface-0 font-medium block truncate">
+                            {{ candidate.name }}
+                        </span>
+
+                        <div class="mt-1 text-muted-color text-sm truncate">
+                            {{ candidate.email }}
+                        </div>
+
+                    </div>
+
                     <span
-                        class="text-surface-900 dark:text-surface-0 font-medium mr-2 mb-1 md:mb-0">{{ candidate.name }}</span>
-                    <div class="mt-1 text-muted-color">{{ candidate.email }}</div>
+                        class="font-medium text-sm shrink-0"
+                        [ngClass]="
+                            getRankColor(candidate.rank).text
+                        "
+                    >
+                        {{ candidate.score }}%
+                    </span>
+
                 </div>
-                <div class="mt-2 md:mt-0 flex items-center">
+
+                <!-- Score -->
+                <div class="flex items-center gap-2 mt-2">
+
                     <div
-                        class="rounded-border w-full overflow-hidden lg:w-24 bg-surface-300 dark:bg-surface-500"
-                        style="height: 8px"
+                        class="rounded-border flex-1 overflow-hidden bg-surface-300 dark:bg-surface-500"
+                        style="height: 7px"
                     >
                         <div
                             class="h-full"
                             [ngClass]="getRankColor(candidate.rank).bg"
-                            [style.width.%]="candidate.score">
-                        </div>
+                            [style.width.%]="candidate.score"
+                        ></div>
                     </div>
 
-                    <span
-                        class="ml-4 font-medium"
-                        [ngClass]="colors[candidate.rank - 1]?.text ?? 'text-gray-500'"
-                    >
-    {{ candidate.score }}%
-</span>
                 </div>
+
             </li>
+
         }
 
     </ul>
+
 </div>

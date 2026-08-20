@@ -1,34 +1,63 @@
 <div class="card mb-8!">
-    <div class="font-semibold text-xl mb-4">Applications</div>
-    <p-table [value]="applications()" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+
+    <div class="font-semibold text-lg md:text-xl mb-4">
+        Recent Applications
+    </div>
+
+    <p-table
+        [value]="applications()"
+        [paginator]="true"
+        [rows]="5"
+        [responsiveLayout]="'scroll'"
+    >
+
         <ng-template #header>
             <tr>
                 <th>№</th>
-                <th pSortableColumn="name">Name
-                    <p-sortIcon field="name"></p-sortIcon>
+
+                <th pSortableColumn="student">
+                    Name
+                    <p-sortIcon field="student" />
                 </th>
-                <th pSortableColumn="price">Job
-                    <p-sortIcon field="price"></p-sortIcon>
+
+                <th pSortableColumn="jobName">
+                    Job
+                    <p-sortIcon field="jobName" />
                 </th>
+
                 <th>Status</th>
             </tr>
         </ng-template>
-        <ng-template #body let-application>
+
+        <ng-template #body let-application let-rowIndex="rowIndex">
             <tr>
+
                 <td>
-                    {{ application.id }}
+                    {{ rowIndex + 1 }}
                 </td>
+
                 <td>
-                    {{ application.student }}
+                    <span class="font-medium">
+                        {{ application.student }}
+                    </span>
                 </td>
+
                 <td>
-                    {{ application.jobName }}
+                    <span class="block max-w-45 truncate">
+                        {{ application.jobName }}
+                    </span>
                 </td>
+
                 <td>
-                      {{ application.status }}
+                    <p-tag
+                        [value]="application.status"
+                        [severity]="getStatusSeverity(application.status)"
+                    />
                 </td>
 
             </tr>
         </ng-template>
+
     </p-table>
+
 </div>
