@@ -4,31 +4,33 @@
             <p-inputicon>
                 <i class="pi pi-search"></i>
             </p-inputicon>
-            <input pInputText pSize="small" type="text" (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search" />
+            <input pInputText pSize="small" type="text"
+                   (input)="dt1.filterGlobal($any($event.target).value, 'contains')" placeholder="Keyword Search"/>
         </p-iconfield>
     </div>
-    <p-table #dt1 [value]="applications()" [paginator]="'true'" [rows]="12" [globalFilterFields]="['id','jobTitle','name','status','appliedAt']">
+    <p-table #dt1 [value]="applications()" [paginator]="'true'" [rows]="12"
+             [globalFilterFields]="['id','jobTitle','name','status','appliedAt']">
         <ng-template #header>
             <tr class="hidden md:table-row">
                 <th pSortableColumn="id">
                     №
-                    <p-sortIcon field="id" />
+                    <p-sortIcon field="id"/>
                 </th>
                 <th pSortableColumn="jobTitle">
                     Job
-                    <p-sortIcon field="jobTitle" />
+                    <p-sortIcon field="jobTitle"/>
                 </th>
                 <th pSortableColumn="userName">
                     User
-                    <p-sortIcon field="userName" />
+                    <p-sortIcon field="userName"/>
                 </th>
                 <th pSortableColumn="status">
                     status
-                    <p-sortIcon field="id" />
+                    <p-sortIcon field="id"/>
                 </th>
                 <th class="w-36" pSortableColumn="appliedAt">
                     AppliedAt
-                    <p-sortIcon field="appliedAt" />
+                    <p-sortIcon field="appliedAt"/>
                 </th>
                 <th>Actions</th>
             </tr>
@@ -36,15 +38,18 @@
 
         <ng-template #body let-application let-rowIndex="rowIndex">
             <tr class="hidden md:table-row">
-                <td>{{ rowIndex+1 }}</td>
+                <td>{{ rowIndex + 1 }}</td>
                 <td>{{ application.jobTitle }}</td>
                 <td>{{ application.userName }}</td>
                 <td>
-                    <p-tag [severity]="getStatusLabel(application.status).severity"> {{getStatusLabel(application.status).label}}</p-tag>
+                    <p-tag
+                        [severity]="getStatusLabel(application.status).severity"> {{ getStatusLabel(application.status).label }}
+                    </p-tag>
                 </td>
                 <td>{{ application.appliedAt | date:'dd-MM-yyyy' }}</td>
                 <td>
-                    <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'"><i class="pi pi-eye"></i></p-button>
+                    <p-button variant="outlined" (click)="openDetails(application.id)" [pTooltip]="'View application'">
+                        <i class="pi pi-eye"></i></p-button>
                 </td>
             </tr>
             <tr class="md:hidden">
@@ -71,7 +76,6 @@
                                 [value]="status.label"
                                 styleClass="text-[10px]!"
                             />
-
                         </div>
 
                         <div class="mt-2 text-[11px]">
