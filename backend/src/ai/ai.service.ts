@@ -3,8 +3,8 @@ import axios from 'axios';
 
 @Injectable()
 export class AiService {
-  private readonly ollamaUrl = 'http://localhost:11434/api/generate';
-
+  // private readonly ollamaUrl = 'http://localhost:11434/api/generate';
+  private readonly ollamaUrl = `${process.env.OLLAMA_URL}/api/generate`;
   async analyzeStudent(data: any) {
     const prompt = `
 Sen HR va ta'lim ekspertisan.
