@@ -31,7 +31,7 @@ Format:
 `;
 
     const response = await axios.post(this.ollamaUrl, {
-      model: 'qwen2.5:7b',
+      model: process.env.OLLAMA_MODEL,
       prompt,
       stream: false,
       format: 'json',
