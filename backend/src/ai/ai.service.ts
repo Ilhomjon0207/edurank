@@ -3,8 +3,10 @@ import axios from 'axios';
 
 @Injectable()
 export class AiService {
-  // private readonly ollamaUrl = 'http://localhost:11434/api/generate';
   private readonly ollamaUrl = `${process.env.OLLAMA_URL}/api/generate`;
+
+  private readonly ollamaModel = process.env.OLLAMA_MODEL;
+
   async analyzeStudent(data: any) {
     const prompt = `
 Sen HR va ta'lim ekspertisan.
@@ -31,7 +33,7 @@ Format:
 `;
 
     const response = await axios.post(this.ollamaUrl, {
-      model: process.env.OLLAMA_MODEL,
+      model: this.ollamaModel,
       prompt,
       stream: false,
       format: 'json',
@@ -84,7 +86,7 @@ JSON format:
 `;
 
     const response = await axios.post(this.ollamaUrl, {
-      model: 'qwen2.5:3b',
+      model: this.ollamaModel,
       prompt,
       stream: false,
       format: 'json',
